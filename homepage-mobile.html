@@ -22,6 +22,7 @@
       --wrap: 343px;
       --font: "Chillax", "Chillax Variable", sans-serif;
       --dusk: radial-gradient(120% 90% at 90% 0%, #ff7124 0%, #3c4884 48%, #121527 100%);
+      --bar-h: 32px;
       /* návrat peny bez odskoku cez kľudovú polohu */
       --foam-back: cubic-bezier(0.22, 0.9, 0.28, 1);
       /* odpor na začiatku, potom pena povolí */
@@ -33,7 +34,6 @@
     html, body {
       background: #0b0908;
       max-width: 100%;
-      overflow-x: clip;
     }
 
     body {
@@ -60,8 +60,8 @@
       width: 100%;
       max-width: 768px;
       margin: 0 auto;
+      padding-top: var(--bar-h);
       background: #0b0908;
-      overflow-x: clip;
     }
 
     .wrap {
@@ -116,27 +116,21 @@
     .theme-dusk .pill--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.72); }
 
     section { padding: var(--section) 0; }
-    #system { padding: 0; }
-    #system .wrap { padding-bottom: 0; }
+    #system { padding-bottom: 0; }
+    #system .wrap { padding-bottom: 40px; }
     .system-pin { position: relative; }
     .system-stick {
+      position: relative;
+      z-index: 4;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
-      height: calc(100svh - 32px);
-      padding: 40px 0;
+      height: calc(100svh - var(--bar-h));
+      padding: 40px 0 32px;
+      overflow: hidden;
       background: var(--charcoal-dark);
     }
-    .system-stick .wrap {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      min-height: 0;
-    }
-    .system-stick.is-fixed {
-      position: fixed;
-      z-index: 4;
-    }
+    .system-stick.is-fixed { position: fixed; }
     .system-stick.is-end {
       position: absolute;
       right: 0;
@@ -144,15 +138,32 @@
       left: 0;
       width: auto;
     }
+    .system-stick .wrap {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-height: 0;
+      padding-bottom: 0;
+    }
+    .system-head {
+      position: relative;
+      z-index: 2;
+      flex: 0 0 auto;
+      padding-bottom: 8px;
+      background: var(--charcoal-dark);
+    }
     .layers-viewport {
+      position: relative;
       flex: 1;
       min-height: 0;
       margin-top: 8px;
       overflow: hidden;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%);
     }
-    #system .pill { margin-top: 16px; }
+    #system .pill { flex: 0 0 auto; margin-top: 16px; }
+    .layers-list > li:first-child { border-top: 0; }
+    .layers-list > li:last-child { border-bottom: 0; }
 
     .pill {
       display: inline-flex;
@@ -218,10 +229,14 @@
 
     /* Bar */
     .bar {
-      position: sticky;
+      position: fixed;
       top: 0;
-      z-index: 40;
-      height: 32px;
+      right: 0;
+      left: 0;
+      z-index: 80;
+      width: min(100%, 768px);
+      height: var(--bar-h);
+      margin-inline: auto;
       overflow: hidden;
       background: var(--orange);
       color: var(--ink);
@@ -242,7 +257,7 @@
       gap: 11px;
       padding-inline: 12px;
       font-size: 15px;
-      line-height: 32px;
+      line-height: var(--bar-h);
     }
 
     .bar__track i {
@@ -744,29 +759,27 @@
     }
 
     /* Layers */
-    .layers-list { display: grid; margin: 0; overflow-anchor: none; will-change: transform; }
+    .layers-list { position: relative; display: grid; margin: 0; }
     .layers-list > li {
       display: grid;
-      grid-template-columns: 120px minmax(0, 1fr);
-      gap: 16px;
-      align-items: center;
-      padding: 16px 0;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 20px 0;
       list-style: none;
-      border-top: 1px solid transparent;
-      border-bottom: 1px solid transparent;
-      overflow-anchor: none;
-      transition: border-color 560ms var(--foam-back);
+      border-top: 1px solid #676c83;
+      border-bottom: 1px solid #676c83;
     }
     .layers-list img {
       width: 100%;
+      max-width: 280px;
       height: auto;
     }
     .layers-list > li > div {
       display: grid;
-      grid-template-rows: auto 1fr 0fr 0fr;
+      grid-template-rows: auto 0fr 1fr 1fr;
       align-self: start;
       min-width: 0;
-      transition: grid-template-rows 560ms var(--foam-back);
     }
     .layers-list > li > div > * {
       min-height: 0;
@@ -774,9 +787,9 @@
     }
     .layers-list strong {
       display: block;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 560ms var(--foam-back), font-size 560ms var(--foam-back);
+      color: var(--orange);
+      font-size: 16px;
+      font-weight: 700;
     }
     .layers-list b,
     .layers-list .more {
@@ -789,26 +802,7 @@
       font-size: 12px;
       line-height: 1.5;
     }
-    .layers-list li.is-hot {
-      grid-template-columns: minmax(0, 1fr);
-      align-items: start;
-      gap: 12px;
-      padding: 20px 0;
-      border-color: #676c83;
-    }
-    .layers-list li.is-hot img {
-      width: 100%;
-      max-width: 280px;
-    }
-    .layers-list li.is-hot > div {
-      grid-template-rows: auto 0fr 1fr 1fr;
-    }
-    .layers-list li.is-hot strong {
-      color: var(--orange);
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .layers-list li.is-hot b {
+    .layers-list b {
       margin-top: 4px;
       color: #fff;
       font-size: 15px;
@@ -1330,8 +1324,10 @@
       <div class="system-pin" data-system-pin>
         <div class="system-stick" data-system-stick>
           <div class="wrap">
-            <h2 class="lower"><strong>ako to funguje?</strong></h2>
-            <p class="lead">ZIW systém tvorí premyslená súhra špeciálnych vrstiev, ktoré sa vzájomne dopĺňajú a spoločne sa prispôsobujú rôznym spánkovým polohám, telesnej hmotnosti …</p>
+            <div class="system-head">
+              <h2 class="lower"><strong>ako to funguje?</strong></h2>
+              <p class="lead">ZIW systém tvorí premyslená súhra špeciálnych vrstiev, ktoré sa vzájomne dopĺňajú a spoločne sa prispôsobujú rôznym spánkovým polohám, telesnej hmotnosti …</p>
+            </div>
             <div class="layers-viewport">
               <ol class="layers-list">
           <li>
@@ -1677,44 +1673,48 @@
       window.addEventListener("resize", check);
       check();
 
+      var barEl = document.querySelector(".bar");
+      function syncBar() {
+        if (!barEl) return;
+        document.documentElement.style.setProperty("--bar-h", barEl.offsetHeight + "px");
+      }
+      syncBar();
+      window.addEventListener("resize", syncBar);
+
       var layerRows = document.querySelectorAll(".layers-list li");
       var layerList = document.querySelector(".layers-list");
       var systemPin = document.querySelector("[data-system-pin]");
       var systemStick = document.querySelector("[data-system-stick]");
-      var hotLayer = null;
-      function alignHot(index) {
-        var row = layerRows[index];
-        if (!row || !layerList) return;
-        var view = layerList.parentElement.getBoundingClientRect();
-        var rowBox = row.getBoundingClientRect();
-        var half = rowBox.height / 2;
-        var target = window.innerHeight / 2;
-        target = Math.max(view.top + half, Math.min(view.bottom - half, target));
-        var current = 0;
-        var match = /translateY\(([-\d.]+)px\)/.exec(layerList.style.transform || "");
-        if (match) current = parseFloat(match[1]);
-        layerList.style.transform = "translateY(" + (current + target - (rowBox.top + half)) + "px)";
+      function viewHeight() {
+        var vv = window.visualViewport;
+        return Math.round((vv && vv.height) || window.innerHeight);
       }
-      function placeLayers(index) {
-        var changed = layerRows[index] !== hotLayer;
-        layerRows.forEach(function (li, i) { li.classList.toggle("is-hot", i === index); });
-        alignHot(index);
-        hotLayer = layerRows[index];
-        if (!changed) return;
-        var t0 = performance.now();
-        function follow(now) {
-          alignHot(index);
-          if (now - t0 < 580 && hotLayer === layerRows[index]) requestAnimationFrame(follow);
-        }
-        requestAnimationFrame(follow);
+      function barBottom() {
+        return barEl ? barEl.getBoundingClientRect().bottom : 32;
+      }
+      function placeSystemLayers(p) {
+        if (!layerList || !layerRows.length) return;
+        var view = layerList.parentElement;
+        var first = layerRows[0];
+        var lastRow = layerRows[layerRows.length - 1];
+        var pad = 28;
+        var startY = pad - (first.offsetTop - layerList.offsetTop);
+        var endY = view.clientHeight - pad - (lastRow.offsetTop - layerList.offsetTop + lastRow.offsetHeight);
+        layerList.style.transform = "translateY(" + (startY + (endY - startY) * p) + "px)";
+      }
+      function layoutSystem() {
+        if (!systemPin || !systemStick || reduce) return;
+        var h = Math.max(420, viewHeight() - Math.round(barBottom()));
+        systemStick.style.height = h + "px";
+        systemPin.style.height = (h + Math.round(viewHeight() * 1.6)) + "px";
+        scrubSystem();
       }
       function scrubSystem() {
         if (!systemPin || !systemStick || reduce) return;
         var h = systemStick.offsetHeight;
         var travel = Math.max(1, systemPin.offsetHeight - h);
-        var scrolled = 32 - systemPin.getBoundingClientRect().top;
-        var vv = window.visualViewport;
-        var top = 32 + (vv ? vv.offsetTop : 0);
+        var top = barBottom();
+        var scrolled = top - systemPin.getBoundingClientRect().top;
         systemStick.classList.remove("is-fixed", "is-end");
         systemStick.style.top = "";
         systemStick.style.left = "";
@@ -1728,16 +1728,7 @@
         } else if (scrolled >= travel) {
           systemStick.classList.add("is-end");
         }
-        var p = Math.max(0, Math.min(1, scrolled / travel));
-        placeLayers(Math.round(p * (layerRows.length - 1)));
-      }
-      function layoutSystem() {
-        if (!systemPin || !systemStick || reduce) return;
-        var viewH = Math.round((window.visualViewport && window.visualViewport.height) || window.innerHeight);
-        var h = Math.max(420, viewH - 32);
-        systemStick.style.height = h + "px";
-        systemPin.style.height = (h + Math.round(viewH * 1.7)) + "px";
-        scrubSystem();
+        placeSystemLayers(Math.max(0, Math.min(1, scrolled / travel)));
       }
       window.addEventListener("scroll", scrubSystem, { passive: true });
       window.addEventListener("resize", layoutSystem);
