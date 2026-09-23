@@ -1718,7 +1718,26 @@
       .choice-pin .choice { position: static; }
       a.is-sunk, button.is-sunk, .rail > article.is-sunk, .card.is-sunk,
       .layers-list > li.is-sunk { transform: none; }
+      [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
     }
+
+    [data-reveal] {
+      opacity: 0;
+      transition-property: opacity, transform;
+      transition-duration: 0.7s;
+      transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+    [data-reveal="fade-up"] { transform: translateY(32px); }
+    [data-reveal="fade-up"].ziw-is-visible {
+      opacity: 1;
+      transform: none;
+    }
+    [data-reveal="fade"].ziw-is-visible { opacity: 1; }
   </style>
 </head>
 <body>
@@ -2803,6 +2822,44 @@
       menu.querySelectorAll("a").forEach(function (a) {
         a.addEventListener("click", closeMenu);
       });
+    })();
+
+    (function () {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var groups = [
+        [".phone h1, section h2, section .lead, .reviews-head, .score, .bars, .compare-table, .pressure img, .pressure__copy, .close__mark, .close p, .hero__proof, .foot .logo, .foot nav, .foot small, .foot .legal", "fade-up"],
+        [".rail > *, .layers-list > li, .risk li, section .pill", "fade"]
+      ];
+      var all = [];
+      groups.forEach(function (pair) {
+        var type = pair[1];
+        var parent = null;
+        var n = 0;
+        document.querySelectorAll(pair[0]).forEach(function (el) {
+          if (el.closest(".bar, .top, .dock, .menu, .hero__art, .pains, .pains-mask")) return;
+          if (el.hasAttribute("data-reveal")) return;
+          el.setAttribute("data-reveal", type);
+          if (el.parentElement !== parent) {
+            parent = el.parentElement;
+            n = 0;
+          }
+          if (n) el.style.setProperty("--reveal-delay", Math.min(n, 5) * 70 + "ms");
+          n += 1;
+          all.push(el);
+        });
+      });
+      if (reduce || !("IntersectionObserver" in window)) {
+        all.forEach(function (el) { el.classList.add("ziw-is-visible"); });
+        return;
+      }
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("ziw-is-visible");
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      all.forEach(function (el) { observer.observe(el); });
     })();
   </script>
 </body>
