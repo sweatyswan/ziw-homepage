@@ -178,13 +178,8 @@
     .rail > .card {
       flex: 0 0 253px;
       scroll-snap-align: start;
-      transform: scale(0.86);
-      transform-origin: left center;
-      transition: transform 640ms var(--foam-back);
+      scroll-snap-stop: always;
     }
-    .rail > .is-hot { transform: scale(1); }
-    .rail > .is-sunk { transform: translateY(2px) scale(0.83); }
-    .rail > .is-hot.is-sunk { transform: translateY(2px) scale(0.97); }
 
     /* Bar */
     .bar {
@@ -733,9 +728,10 @@
     }
     .layers-list > li > div {
       display: grid;
-      grid-template-rows: auto auto 0fr 0fr;
+      grid-template-rows: auto 1fr 0fr 0fr;
       align-self: start;
       min-width: 0;
+      transition: grid-template-rows 560ms var(--foam-back);
     }
     .layers-list > li > div > * {
       min-height: 0;
@@ -770,7 +766,7 @@
       max-width: 280px;
     }
     .layers-list li.is-hot > div {
-      grid-template-rows: auto 0fr auto auto;
+      grid-template-rows: auto 0fr 1fr 1fr;
     }
     .layers-list li.is-hot strong {
       color: var(--orange);
@@ -1644,16 +1640,31 @@
       var hotLayer = null;
       var layersReady = false;
       var layerTick = false;
-      var layerLock = 0;
+      var centering = false;
+      function easeCenter(t) { return 1 - Math.pow(1 - t, 3); }
+      function centerLayer(li) {
+        if (!li || reduce) return;
+        centering = true;
+        var t0 = performance.now();
+        function step(now) {
+          var t = Math.min(1, (now - t0) / 560);
+          var r = li.getBoundingClientRect();
+          var delta = (r.top + r.height / 2) - window.innerHeight / 2;
+          if (Math.abs(delta) > 0.5) window.scrollBy(0, delta * (0.22 + 0.5 * easeCenter(t)));
+          if (t < 1) requestAnimationFrame(step);
+          else centering = false;
+        }
+        requestAnimationFrame(step);
+      }
       function zoomLayers() {
-        if (Date.now() < layerLock) return;
+        if (centering) return;
         var mid = window.innerHeight / 2;
         var best = null;
-        var bestDist = 180;
+        var bestDist = 220;
         var hotDist = Infinity;
         layerRows.forEach(function (li) {
           var r = li.getBoundingClientRect();
-          if (r.bottom < 48 || r.top > window.innerHeight - 48) return;
+          if (r.bottom < 0 || r.top > window.innerHeight) return;
           var dist = Math.abs((r.top + r.bottom) / 2 - mid);
           if (li === hotLayer) hotDist = dist;
           if (dist < bestDist) {
@@ -1661,17 +1672,12 @@
             best = li;
           }
         });
-        if (hotLayer && best && best !== hotLayer && hotDist < bestDist + 80) best = hotLayer;
+        if (hotLayer && best && best !== hotLayer && hotDist < bestDist + 48) best = hotLayer;
         if (best === hotLayer && layersReady) return;
-        var anchor = best ? best.getBoundingClientRect().top : 0;
         layerRows.forEach(function (li) { li.classList.toggle("is-hot", li === best); });
-        if (best && layersReady) {
-          var shift = best.getBoundingClientRect().top - anchor;
-          if (Math.abs(shift) > 1) window.scrollBy(0, shift);
-        }
-        layerLock = Date.now() + 450;
         hotLayer = best;
         layersReady = true;
+        centerLayer(best);
       }
       function onLayerScroll() {
         if (layerTick) return;
@@ -1788,21 +1794,29 @@
         function scrub() {
           var h = section.offsetHeight;
           var travel = Math.max(1, pin.offsetHeight - h);
-          var scrolled = stickyTop - pin.getBoundingClientRect().top;
+          var pinTop = pin.getBoundingClientRect().top;
+          var scrolled = stickyTop - pinTop;
           var vv = window.visualViewport;
           var top = stickyTop + (vv ? vv.offsetTop : 0);
+          var mode = scrolled <= 0 ? "flow" : (scrolled >= travel ? "end" : "fixed");
           section.classList.remove("is-fixed", "is-end");
           section.style.top = "";
           section.style.left = "";
           section.style.width = "";
-          if (scrolled > 0 && scrolled < travel) {
+          if (mode === "fixed") {
             var box = pin.getBoundingClientRect();
             section.classList.add("is-fixed");
             section.style.top = top + "px";
             section.style.left = box.left + "px";
             section.style.width = box.width + "px";
-          } else if (scrolled >= travel) {
+          } else if (mode === "end") {
             section.classList.add("is-end");
+          }
+          if (mode !== scrub.mode) {
+            // #region agent log
+            fetch('http://127.0.0.1:7623/ingest/f185a511-a5a8-4402-bd20-653612b5a503',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'106ad1'},body:JSON.stringify({sessionId:'106ad1',hypothesisId:'A',location:'homepage-mobile.html:scrub',message:'choice pin mode',data:{from:scrub.mode||'start',to:mode,scrolled:Math.round(scrolled),travel:Math.round(travel),scrollY:Math.round(window.scrollY),pinTop:Math.round(pinTop),vvTop:vv?Math.round(vv.offsetTop):0},timestamp:Date.now()})}).catch(function(){});
+            // #endregion
+            scrub.mode = mode;
           }
           render(Math.max(0, Math.min(1, scrolled / travel)));
         }
@@ -1905,7 +1919,8 @@
 
       document.querySelectorAll("[data-rail]").forEach(function (rail) {
         var dots = rail.parentElement.querySelector(".dots");
-        var items = dots ? dots.querySelectorAll("i") : [];
+        if (!dots) return;
+        var items = dots.querySelectorAll("i");
         var cards = rail.children;
         function paint() {
           var edge = rail.scrollLeft + 16;
@@ -1917,9 +1932,6 @@
               bestDist = dist;
               best = i;
             }
-          }
-          for (var j = 0; j < cards.length; j++) {
-            cards[j].classList.toggle("is-hot", j === best);
           }
           items.forEach(function (dot, idx) { dot.classList.toggle("is-on", idx === best); });
         }
