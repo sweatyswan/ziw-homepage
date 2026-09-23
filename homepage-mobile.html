@@ -30,7 +30,11 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body { background: #0b0908; }
+    html, body {
+      background: #0b0908;
+      max-width: 100%;
+      overflow-x: clip;
+    }
 
     body {
       font-family: var(--font);
@@ -57,7 +61,7 @@
       max-width: 768px;
       margin: 0 auto;
       background: #0b0908;
-      overflow: visible;
+      overflow-x: clip;
     }
 
     .wrap {
@@ -844,7 +848,7 @@
     .compare-col i.is-no iconify-icon { color: var(--muted); }
 
     /* Nights */
-    .nights { position: relative; overflow: visible; padding: 40px 0; }
+    .nights { position: relative; overflow-x: clip; padding: 40px 0; }
     .nights h2 { position: relative; z-index: 1; }
     .nights h2 strong { white-space: nowrap; }
     .nights__bed {
