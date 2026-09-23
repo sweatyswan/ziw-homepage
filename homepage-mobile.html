@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ZIW — homepage mobile</title>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=chillax@400,500,600,700&display=swap">
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+  <style>
+    :root {
+      --orange: #ff7124;
+      --orange-dark: #cc5a1c;
+      --charcoal: #202125;
+      --charcoal-dark: #191a1d;
+      --navy: #181c34;
+      --ink: #0b0908;
+      --paper: #ffffff;
+      --cream: #f3f1f2;
+      --muted: #b5b5b4;
+      --pad: 16px;
+      --section: 40px;
+      --wrap: 343px;
+      --font: "Chillax", "Chillax Variable", sans-serif;
+      --dusk: radial-gradient(120% 90% at 90% 0%, #ff7124 0%, #3c4884 48%, #121527 100%);
+      /* návrat peny bez odskoku cez kľudovú polohu */
+      --foam-back: cubic-bezier(0.22, 0.9, 0.28, 1);
+      /* odpor na začiatku, potom pena povolí */
+      --foam-sink: cubic-bezier(0.55, 0.02, 0.45, 0.28);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { background: #0b0908; }
+
+    body {
+      font-family: var(--font);
+      color: var(--cream);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; background: none; border: 0; color: inherit; cursor: pointer; }
+    a, button, .rail > article, .card, .layers-list > li {
+      transform-origin: center center;
+      transition: transform 480ms var(--foam-back);
+    }
+    a.is-sunk, button.is-sunk, .rail > article.is-sunk, .card.is-sunk, .layers-list > li.is-sunk {
+      transform: translateY(3px) scale(0.985);
+      transition-duration: 220ms;
+      transition-timing-function: var(--foam-sink);
+    }
+    img { display: block; max-width: 100%; }
+    h1, h2, h3, p { font-weight: 400; }
+
+    .phone {
+      width: min(100%, 375px);
+      margin: 0 auto;
+      background: #0b0908;
+      overflow: visible;
+    }
+
+    .wrap {
+      width: min(calc(100% - 2 * var(--pad)), var(--wrap));
+      margin-inline: auto;
+    }
+
+    iconify-icon {
+      display: block;
+      color: currentColor;
+    }
+
+    h2 {
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -1px;
+    }
+
+    h2 strong { display: block; font-weight: 700; }
+
+    .lower { text-transform: lowercase; }
+
+    .lead {
+      margin-top: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .lead strong { font-weight: 500; }
+    .lead b { font-weight: 700; }
+
+    .lead--tight { margin-top: 8px; }
+
+    .theme-light { background: var(--paper); color: var(--charcoal); }
+    .theme-dark { background: var(--charcoal-dark); color: var(--cream); }
+    .theme-black { background: var(--charcoal-dark); color: #fff; }
+    .theme-orange { background: var(--orange); color: var(--charcoal); }
+    .theme-dusk,
+    .dusk-band {
+      background: var(--dusk);
+      color: #fff;
+    }
+    .dusk-band {
+      background: radial-gradient(90% 70% at 50% 22%, #2c2e33 0%, #1a1b1e 48%, #121314 100%);
+    }
+    .theme-dusk--rise {
+      background: radial-gradient(120% 90% at 0% 100%, #ff7124 0%, #3c4884 48%, #121527 100%);
+    }
+    .dusk-band .theme-dusk,
+    .dusk-span > .theme-dusk { background: transparent; }
+    .dusk-span { background: var(--dusk); }
+    .theme-dusk .pill--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.72); }
+
+    section { padding: var(--section) 0; }
+    #system { padding-bottom: 0; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 10px 24px;
+      border: 1px solid var(--orange-dark);
+      border-radius: 100px;
+      background: var(--orange);
+      color: var(--charcoal);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .pill iconify-icon { width: 16px; height: 16px; }
+
+    .pill.is-moving { transition: transform 560ms cubic-bezier(0.22, 0.8, 0.24, 1); }
+
+    .pill--ghost {
+      width: 100%;
+      margin-top: 24px;
+      background: transparent;
+      color: var(--charcoal);
+    }
+
+    .pill--on-dark {
+      width: auto;
+      border-color: var(--orange);
+      color: #fff;
+    }
+
+    .pill--light {
+      width: 100%;
+      background: #fff;
+      border-color: #fff;
+      color: var(--charcoal);
+    }
+
+    .rail {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding: 0 var(--pad) 36px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--pad);
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .rail::-webkit-scrollbar { display: none; }
+    .rail > * { flex: 0 0 253px; scroll-snap-align: start; }
+
+    /* Bar */
+    .bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: 32px;
+      overflow: hidden;
+      background: var(--orange);
+      color: var(--ink);
+    }
+
+    .bar__track {
+      display: flex;
+      width: max-content;
+      animation: marquee 22s linear infinite;
+    }
+
+    .bar.is-paused .bar__track,
+    .bar.is-paused .pains { animation-play-state: paused; }
+
+    .bar__track span {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      padding-inline: 12px;
+      font-size: 15px;
+      line-height: 32px;
+    }
+
+    .bar__track i {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.42);
+    }
+
+    .bar__pause {
+      position: absolute;
+      top: 0;
+      right: 4px;
+      z-index: 1;
+      width: 32px;
+      height: 32px;
+      background: var(--orange);
+    }
+
+    .bar__pause iconify-icon {
+      margin: 6px auto;
+      color: var(--ink);
+    }
+
+    .bar.is-paused .bar__pause iconify-icon[data-pause-on] { display: none; }
+    .bar:not(.is-paused) .bar__pause iconify-icon[data-play-on] { display: none; }
+
+    /* Header — Figma Color Scheme 6 / #181c34 */
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      padding: 0 var(--pad);
+      background: var(--navy);
+      border-bottom: 1px solid #272d4f;
+      color: #fff;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 23px;
+    }
+
+    .logo img {
+      height: 23px;
+      width: auto;
+    }
+
+    .top__right { display: flex; align-items: center; gap: 16px; }
+
+    .icon-btn {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    /* Hero — rovnaký dusk gradient ako close */
+    .hero {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 579px;
+      padding: 40px 0 0;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .hero__inner {
+      position: relative;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .hero h1 { color: #fff; letter-spacing: -1.6px; }
+
+    .hero__line,
+    .hero__em { display: block; line-height: 1.05; }
+
+    .hero__line { font-size: 32px; }
+    .hero__em { font-size: 40px; font-weight: 700; }
+
+    .hero__art {
+      position: relative;
+      height: 340px;
+      margin: 4px 0 0;
+    }
+
+    .hero__art::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      z-index: 0;
+      width: 300px;
+      height: 240px;
+      transform: translate(-50%, -42%);
+      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.06) 38%, rgba(255, 255, 255, 0) 70%);
+      pointer-events: none;
+    }
+
+    .hero__art::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      z-index: 1;
+      width: 68%;
+      height: 36px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0) 72%);
+      filter: blur(8px);
+      pointer-events: none;
+    }
+
+    /* Figma 12768:4398 — rest pose, then breathe */
+    .capsules {
+      position: absolute;
+      left: 50%;
+      top: 36px;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 1.843px;
+      height: 137.434px;
+      transform: translateX(-50%) scale(0.917);
+      transform-origin: center center;
+      pointer-events: none;
+    }
+
+    .cap {
+      position: relative;
+      flex: 0 0 auto;
+      width: 60.785px;
+      transform-origin: center center;
+      animation: capsule-breathe 3.2s ease-in-out infinite;
+    }
+
+    .cap img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: none;
+    }
+
+    .cap--end { height: 85.08px; }
+    .cap--tall { height: 133.831px; }
+    .cap--mid { height: 85.291px; }
+    .cap--short { height: 54.78px; overflow: visible; }
+    .cap--short img { position: absolute; inset: -55.31% 0 auto 0; }
+    .cap--dot { width: 60.926px; height: 137.434px; }
+    .cap--low { height: 69.342px; overflow: visible; }
+    .cap--low img { position: absolute; inset: 0 0 -22.7% 0; height: auto; }
+
+    .cap:nth-child(2) { animation-delay: 0.28s; }
+    .cap:nth-child(3) { animation-delay: 0.52s; }
+    .cap:nth-child(4) { animation-delay: 0.12s; }
+    .cap:nth-child(5) { animation-delay: 0.4s; }
+    .cap:nth-child(6) { animation-delay: 0.64s; }
+
+    .hero__bed {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      z-index: 2;
+      width: min(175%, 620px);
+      transform-origin: center bottom;
+      animation: bed-breathe 3.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .hero__cta {
+      position: relative;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      min-height: 42px;
+    }
+
+    .hero__proof {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .hero__proof b {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* Choice — sticky while vertical scroll scrubs the lineup */
+    .choice-pin .choice {
+      position: sticky;
+      top: 32px;
+      z-index: 3;
+      background: radial-gradient(90% 70% at 50% 22%, #2c2e33 0%, #1a1b1e 48%, #121314 100%);
+    }
+    .choice { padding-bottom: 48px; }
+    .choice h2 { color: #f3f1f2; }
+    .choice h2 b { display: block; font-weight: 700; white-space: nowrap; }
+    .choice h2 em { color: var(--orange); font-style: normal; font-weight: 700; }
+
+    .count {
+      position: relative;
+      height: 44px;
+      margin-top: 20px;
+    }
+
+    .count__line,
+    .count__done {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      transition: opacity 380ms cubic-bezier(0.2, 0.6, 0.2, 1), transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .count b {
+      color: #fff;
+      font-size: 40px;
+      font-weight: 500;
+      letter-spacing: -0.4px;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .count span { color: rgba(243, 241, 242, 0.72); font-size: 14px; line-height: 1.5; }
+    .count__done { opacity: 0; transform: translateY(6px); }
+    .count__done b { color: var(--orange); }
+    .choice.is-done .count__line { opacity: 0; }
+    .choice.is-done .count__done { opacity: 1; transform: none; }
+
+    .pains-mask {
+      position: relative;
+      height: 170px;
+      margin-top: 28px;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+    }
+
+    .pains {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      padding: 0 var(--pad);
+      will-change: transform;
+    }
+
+    .pain {
+      flex: 0 0 auto;
+      width: 58px;
+      opacity: 0.6;
+    }
+
+    .pain span {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      height: 20px;
+      margin-bottom: 5px;
+      color: rgba(243, 241, 242, 0.62);
+      font-size: 11px;
+      line-height: 1.1;
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    .pain img {
+      width: 100%;
+      height: 94px;
+      object-fit: contain;
+    }
+
+    .pain-hero {
+      flex: 0 0 auto;
+      width: 100px;
+    }
+
+    .pain-hero__bubble {
+      position: relative;
+      margin-bottom: 6px;
+      padding: 5px 8px;
+      border-radius: 16px;
+      background: var(--orange);
+      color: var(--charcoal);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.25;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .pain-hero__bubble i {
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: var(--orange);
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    .pain-hero__card { position: relative; }
+
+    .pain-hero__glow {
+      position: absolute;
+      inset: -18px -16px -20px;
+      border-radius: 30px;
+      background: radial-gradient(60% 60% at 50% 60%, rgba(255, 113, 36, 0.32), rgba(255, 113, 36, 0) 70%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .pain-hero__card img {
+      position: relative;
+      width: 100%;
+      height: 94px;
+      padding: 8px 7px 7px;
+      border: 1px solid rgba(39, 45, 78, 0.12);
+      border-radius: 16px;
+      background: #c5c6c8;
+      object-fit: contain;
+      box-shadow: 0 18px 40px rgba(11, 12, 20, 0.5);
+    }
+
+    .choice.is-done .pain-hero__bubble,
+    .choice.is-done .pain-hero__glow { opacity: 1; transform: none; }
+    .choice.is-scrub .count__line,
+    .choice.is-scrub .count__done,
+    .choice.is-scrub .pain-hero__bubble,
+    .choice.is-scrub .pain-hero__glow { transition: none; }
+
+    /* Cards */
+    .card {
+      overflow: hidden;
+      border-radius: 30px;
+    }
+
+    .card--dark { background: var(--charcoal-dark); }
+    .card--light {
+      background: #fff;
+      box-shadow: 0 20px 24px -4px rgba(0, 0, 0, 0.08);
+    }
+
+    .card img.media {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .card figcaption { padding: 16px; }
+
+    .card__num {
+      color: var(--orange);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .card--dark .card__num {
+      color: var(--orange);
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .card--dark strong { display: block; color: #fff; font-size: 14px; font-weight: 500; }
+    .card--dark span { display: block; color: rgba(255, 255, 255, 0.86); font-size: 11px; }
+    .card--light strong { display: block; color: var(--charcoal); font-size: 14px; font-weight: 500; }
+    .card--light span { display: block; color: #545252; font-size: 12px; }
+
+    .story {
+      overflow: hidden;
+      border-radius: 30px;
+      background: var(--charcoal-dark);
+    }
+
+    .story img { width: 100%; height: 296px; object-fit: cover; }
+    .story figcaption { padding: 24px; }
+    .story strong { display: block; margin-top: 16px; color: #fff; font-size: 16px; font-weight: 500; }
+    .story .who { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+
+    .dots i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d8dae6;
+    }
+
+    .dots i.is-on { background: var(--orange); }
+
+    .expert-still { position: relative; }
+    .expert-still img { height: 242px; width: 100%; object-fit: cover; background: #eee; }
+    .expert-still::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(32, 33, 36, 0) 42%, rgba(32, 33, 36, 0.72) 72%, rgba(11, 9, 8, 0.92) 100%);
+    }
+
+    .expert-meta {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      left: 12px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(11, 9, 8, 0.45);
+    }
+
+    .card--light .expert-meta,
+    .card--light .expert-meta span { color: #fff; }
+
+    .card--light .play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--orange-dark);
+      border-radius: 50%;
+      background: var(--orange);
+      color: var(--charcoal);
+      line-height: 0;
+      transform: translate(-50%, -50%);
+    }
+
+    .card--light .play iconify-icon {
+      display: block;
+      width: 18px;
+      height: 18px;
+      transform: translateX(1.5px);
+    }
+
+    /* Layers */
+    .layers-list { display: grid; margin: 24px 0 0; }
+    .layers-list li {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 0;
+      list-style: none;
+    }
+    .layers-list img { width: 120px; height: auto; }
+    .layers-list strong { display: block; font-size: 14px; font-weight: 500; }
+    .layers-list b,
+    .layers-list .more { display: none; }
+    .layers-list span { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .layers-list li.is-hot {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 24px;
+      margin-inline: -8px;
+      padding: 24px 8px;
+      border-top: 1px solid #676c83;
+      border-bottom: 1px solid #676c83;
+    }
+    .layers-list li.is-hot img { width: min(240px, 100%); }
+    .layers-list li.is-hot strong {
+      color: var(--orange);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .layers-list li.is-hot b,
+    .layers-list li.is-hot .more { display: block; }
+    .layers-list li.is-hot b {
+      margin-top: 4px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .layers-list li.is-hot:has(.more) > div > span:not(.more) { display: none; }
+
+    /* Compare */
+    .compare h2 { color: var(--orange-dark); }
+    .compare-table {
+      display: flex;
+      align-items: flex-end;
+      margin-top: 24px;
+    }
+    .compare-props {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      width: 120px;
+      list-style: none;
+      padding-bottom: 8px;
+    }
+    .compare-props li {
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+    .compare-ziw,
+    .compare-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 74px;
+      padding: 8px 0;
+    }
+    .compare-ziw { background: var(--orange); border-radius: 24px; }
+    .compare-ziw > img,
+    .compare-col > img {
+      width: 56px;
+      height: 57px;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 20px 24px -4px rgba(0, 0, 0, 0.08);
+    }
+    .compare-ziw > img { border: 1px solid #fff; }
+    .compare-ziw b,
+    .compare-col b {
+      display: block;
+      margin: 8px 0;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .compare-ziw b { color: var(--charcoal); }
+    .compare-ziw i,
+    .compare-col i {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 48px;
+    }
+    .compare-ziw i iconify-icon { color: var(--charcoal); }
+    .compare-col i iconify-icon { color: var(--orange-dark); }
+    .compare-col i.is-no iconify-icon { color: var(--muted); }
+
+    /* Nights */
+    .nights { position: relative; overflow: visible; padding: 40px 0; }
+    .nights h2 { position: relative; z-index: 1; }
+    .nights h2 strong { white-space: nowrap; }
+    .nights__bed {
+      position: absolute;
+      top: 108px;
+      right: -18%;
+      z-index: 2;
+      width: min(65%, 245px);
+      pointer-events: none;
+      transform: rotate(-4deg);
+      filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.22));
+    }
+    .nights .rail { position: relative; z-index: 1; margin-top: 48px; }
+    .nights article {
+      padding: 24px 16px;
+      border-radius: 30px;
+      background: var(--charcoal-dark);
+      color: #fff;
+      box-shadow: 0 20px 24px -4px rgba(0, 0, 0, 0.08);
+    }
+    .nights .ico {
+      width: 48px;
+      height: 48px;
+      margin: 8px auto 16px;
+      color: var(--orange);
+    }
+    .nights h3 { color: #fff; font-size: 22px; font-weight: 500; line-height: 1.2; text-align: center; }
+    .nights p { margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }
+
+    /* Lab — Figma cards are 190px */
+    .lab .rail > * { flex-basis: 190px; }
+    .lab-card {
+      overflow: hidden;
+      border: 1px solid #f2f2f2;
+      border-radius: 30px;
+      background: #fff;
+      box-shadow: 0 8px 8px -4px rgba(0, 0, 0, 0.03), 0 20px 24px -4px rgba(0, 0, 0, 0.08);
+    }
+    .lab-card img { width: 100%; height: 121px; object-fit: cover; background: #fff; }
+    .lab-card b,
+    .lab-card h3,
+    .lab-card p { padding-inline: 16px; }
+    .lab-card b {
+      display: block;
+      margin-top: 8px;
+      color: var(--orange-dark);
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+      line-height: 1;
+    }
+    .lab-card h3 { color: var(--charcoal); font-size: 12px; font-weight: 500; }
+    .lab-card p { padding-bottom: 16px; color: var(--charcoal); font-size: 11px; line-height: 1.5; }
+
+    .pressure img {
+      width: 100%;
+      height: auto;
+      margin-bottom: 16px;
+      border-radius: 24px;
+    }
+
+    .risk ul { margin-top: 24px; list-style: none; }
+    .risk li {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .risk li:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.22); }
+    .risk i {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--charcoal);
+    }
+    .risk i iconify-icon { width: 17px; height: 17px; }
+    .risk h2 { font-weight: 400; }
+    .risk h2 strong { font-size: inherit; font-weight: 700; }
+    .risk li strong { display: block; font-size: 15px; font-weight: 500; }
+    .risk span { color: #f2f2f2; font-size: 12px; line-height: 1.5; }
+
+    /* Reviews */
+    #reviews .rail { margin-top: 40px; }
+    .reviews-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; }
+    .reviews-head span:first-child { color: var(--orange-dark); font-weight: 500; }
+    .reviews-head span:last-child { color: #626b9e; font-size: 12px; }
+    .score { margin: 8px 0 16px; color: var(--charcoal); font-size: 40px; font-weight: 500; letter-spacing: -0.4px; line-height: 1.1; }
+    .bars { display: grid; gap: 8px; color: #626b9e; }
+    .bars div { display: grid; grid-template-columns: 12px 1fr 36px; gap: 10px; align-items: center; font-size: 12px; }
+    .bars i { height: 6px; border-radius: 99px; background: #f2f2f2; }
+    .bars i::after {
+      content: "";
+      display: block;
+      width: var(--p, 10%);
+      height: 100%;
+      border-radius: inherit;
+      background: var(--orange);
+    }
+
+    .quote {
+      margin: 0;
+      padding: 16px 24px;
+      border-radius: 30px;
+      background:
+        linear-gradient(90deg, rgba(11, 9, 8, 0.6) 0%, rgba(11, 9, 8, 0) 50%, rgba(11, 9, 8, 0.6) 100%),
+        #303969;
+      color: #fff;
+      box-shadow: 0 8px 8px -4px rgba(0, 0, 0, 0.03), 0 20px 24px -4px rgba(0, 0, 0, 0.08);
+    }
+    .quote__meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .quote__meta span:first-child { color: var(--orange); font-size: 16px; letter-spacing: -0.4px; line-height: 1.3; }
+    .quote__meta span:last-child { color: #d8dae6; font-size: 11px; }
+    .quote p { font-size: 14px; font-weight: 500; line-height: 1.5; }
+    .quote > span { display: block; margin-top: 16px; color: #d8dae6; font-size: 12px; }
+
+    .close { padding: 40px 0 64px; border-bottom: 1px solid #272d4f; text-align: center; }
+    .close__mark { width: 40px; height: 32px; margin: 0 auto 20px; }
+    .close h2 { max-width: 14ch; margin-inline: auto; }
+    .close p { margin: 8px 0 24px; color: #f2f2f2; font-size: 13px; }
+
+    .foot {
+      padding: 40px 16px 32px;
+      background: radial-gradient(90% 70% at 50% 22%, #2c2e33 0%, #1a1b1e 48%, #121314 100%);
+      color: #fff;
+      text-align: center;
+    }
+    .foot .logo { justify-content: center; margin-bottom: 32px; }
+    .foot nav { display: grid; gap: 20px; font-size: 16px; }
+    .foot hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.12); margin: 32px 0; }
+    .foot small { display: block; margin-top: 16px; color: rgba(255, 255, 255, 0.55); font-size: 12px; }
+    .legal { display: grid; gap: 16px; color: rgba(255, 255, 255, 0.72); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Figma 12768:4373 — CTA bar */
+    .dock {
+      position: fixed;
+      z-index: 60;
+      left: max(16px, calc(50% - 187.5px + 16px));
+      right: max(16px, calc(50% - 187.5px + 16px));
+      bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      height: 54px;
+      padding: 12px 17px;
+      border-radius: 100px;
+      background: rgba(24, 28, 52, 0.5);
+      box-shadow: 0 9.776px 26.884px rgba(11, 12, 20, 0.35);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 420ms ease, transform 420ms ease;
+    }
+
+    .dock.is-on {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    .dock__trial {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .dock__trial b {
+      color: var(--orange);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.16px;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .dock__trial span { font-size: 13px; line-height: 1.5; }
+    .dock__trial strong { font-weight: 600; }
+    .dock .pill { min-height: 28px; padding: 4px 20px; }
+
+    .menu {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      background: #0b0908;
+      color: #fff;
+      padding: 24px 20px;
+    }
+
+    .menu.is-on { display: block; }
+    .menu header { display: flex; justify-content: flex-end; }
+    .menu nav { display: grid; gap: 28px; margin-top: 48px; font-size: 28px; }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    @keyframes capsule-breathe {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(1.12); }
+    }
+
+    @keyframes bed-breathe {
+      0%, 100% { transform: translateX(-50%) scaleY(1); }
+      50% { transform: translateX(-50%) scaleY(1.045); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bar__track, .cap, .hero__bed, .pill.is-moving, .dock,
+      a, button, .rail > article, .card, .layers-list > li {
+        animation: none;
+        transition: none;
+      }
+      .hero__bed { transform: translateX(-50%); }
+      .choice-pin { height: auto !important; }
+      .choice-pin .choice { position: static; }
+      a.is-sunk, button.is-sunk, .rail > article.is-sunk, .card.is-sunk,
+      .layers-list > li.is-sunk { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" data-home>
+    <div class="bar" data-bar>
+      <button class="bar__pause" type="button" data-pause aria-label="Zastaviť">
+        <iconify-icon data-pause-on icon="keyline-icons:pause" width="20" height="20"></iconify-icon>
+        <iconify-icon data-play-on icon="keyline-icons:play" width="20" height="20"></iconify-icon>
+      </button>
+      <div class="bar__track">
+        <span><i></i><strong>4,8 ★</strong> priemer zo 412 recenzií</span>
+        <span><i></i><strong>100 nocí</strong> na vyskúšanie</span>
+        <span><i></i><strong>5 rokov</strong> záruka na konštrukciu</span>
+        <span><i></i><strong>4,8 ★</strong> priemer zo 412 recenzií</span>
+        <span><i></i><strong>100 nocí</strong> na vyskúšanie</span>
+        <span><i></i><strong>5 rokov</strong> záruka na konštrukciu</span>
+      </div>
+    </div>
+
+    <header class="top">
+      <a class="logo" href="#top" aria-label="ZIW">
+        <img src="media/ziw-logo.svg" alt="ZIW" width="109" height="23">
+      </a>
+      <div class="top__right">
+        <button class="icon-btn" type="button" aria-label="Košík">
+          <iconify-icon icon="keyline-icons:shopping-cart" width="20" height="20"></iconify-icon>
+        </button>
+        <button class="icon-btn" type="button" data-menu-open aria-label="Menu">
+          <iconify-icon icon="keyline-icons:menu" width="20" height="20"></iconify-icon>
+        </button>
+      </div>
+    </header>
+
+    <div class="dusk-band">
+    <header class="hero theme-dusk" id="top">
+      <div class="wrap hero__inner">
+        <h1>
+          <span class="hero__line">matrac navrhnutý</span>
+          <span class="hero__em">výskumom</span>
+        </h1>
+        <div class="hero__art" aria-hidden="true">
+          <div class="capsules">
+            <span class="cap cap--end"><img src="media/ziw-kapsula-end.svg" alt="" width="61" height="85"></span>
+            <span class="cap cap--tall"><img src="media/ziw-kapsula.svg" alt="" width="61" height="134"></span>
+            <span class="cap cap--mid"><img src="media/ziw-kapsula-1.svg" alt="" width="61" height="85"></span>
+            <span class="cap cap--short"><img src="media/ziw-kapsula-2.svg" alt="" width="61" height="85"></span>
+            <span class="cap cap--dot"><img src="media/ziw-kapsula-dot.svg" alt="" width="61" height="137"></span>
+            <span class="cap cap--low"><img src="media/ziw-kapsula-3.svg" alt="" width="61" height="85"></span>
+          </div>
+          <img class="hero__bed" src="media/ziw-hero-mattress.png" alt="">
+        </div>
+        <div class="hero__cta" data-hero-slot>
+          <a class="pill" data-cta href="#size">Vybrať rozmer</a>
+          <p class="hero__proof"><b>4,8/5 ★</b> <span>z 412 recenzií</span></p>
+        </div>
+      </div>
+    </header>
+
+    <div class="choice-pin" data-choice-pin>
+    <section class="choice theme-dusk" data-choice>
+      <div class="wrap">
+        <h2 class="lower">viac možností<br>neznamená lepší výber <b>my ti dáme <em>jedno</em> <em>riešenie</em></b></h2>
+        <div class="count">
+          <p class="count__line" data-count-line><b data-count>403</b> <span>matracov vyhovuje</span></p>
+          <p class="count__done" data-done-line><b>1</b> <span>ten správny</span></p>
+        </div>
+      </div>
+      <div class="pains-mask" data-lineup aria-hidden="true">
+        <div class="pains" data-li-track></div>
+      </div>
+    </section>
+    </div>
+    </div>
+
+    <section class="theme-light">
+      <div class="wrap">
+        <h2 class="lower">jeden adaptívny <strong>matrac pre...</strong></h2>
+      </div>
+      <div class="rail" data-rail>
+        <figure class="card card--dark">
+          <img class="media" src="media/ziw-adapt-1.jpg" alt="Spánok na boku">
+          <figcaption>
+            <span class="card__num">01</span>
+            <strong>...všetky spánkové polohy</strong>
+            <span>bok, chrbát aj brucho</span>
+          </figcaption>
+        </figure>
+        <figure class="card card--dark">
+          <img class="media" src="media/ziw-adapt-2.jpg" alt="Každá postava">
+          <figcaption>
+            <span class="card__num">02</span>
+            <strong>...každú postavu</strong>
+            <span>široké plecia aj úzke boky</span>
+          </figcaption>
+        </figure>
+        <figure class="card card--dark">
+          <img class="media" src="media/ziw-adapt-1.jpg" alt="Hmotnosť 55 až 105 kg">
+          <figcaption>
+            <span class="card__num">03</span>
+            <strong>...55 aj 105 kg</strong>
+            <span>chrbtica ostane v línii</span>
+          </figcaption>
+        </figure>
+        <figure class="card card--dark">
+          <img class="media" src="media/ziw-adapt-2.jpg" alt="Dve osoby na jednom matraci">
+          <figcaption>
+            <span class="card__num">04</span>
+            <strong>...oboch naraz</strong>
+            <span>pohyb partnera sa neprenáša</span>
+          </figcaption>
+        </figure>
+      </div>
+      <div class="wrap">
+        <p class="lead"><b>Reaguje na každú zónu tela inak.</b></p>
+        <p class="lead lead--tight">Chrbtica zostane v línii pri 55 aj pri 105 kg. Vy vyberáte iba rozmer.</p>
+        <a class="pill pill--ghost" href="#system">Viac o tvrdosti <iconify-icon icon="keyline-icons:chevron-right" width="16" height="16"></iconify-icon></a>
+      </div>
+    </section>
+
+    <section class="theme-dusk theme-dusk--rise">
+      <div class="wrap">
+        <h2 class="lower">rôzne telá ani rôzne polohy <strong>nie sú problém</strong></h2>
+      </div>
+      <div class="rail" data-rail>
+        <figure class="story">
+          <img src="media/ziw-ugc-1.png" alt="58 kg, spánok na boku">
+          <figcaption>
+            <span class="card__num">58 kg, spánok na boku</span>
+            <strong>„Plece mi ráno netŕpne“</strong>
+            <span class="who">Zuzana</span>
+          </figcaption>
+        </figure>
+        <figure class="story">
+          <img src="media/ziw-ugc-2.png" alt="92 kg, spánok na chrbte">
+          <figcaption>
+            <span class="card__num">92 kg, spánok na chrbte</span>
+            <strong>„Ráno nie sú kríže prvé, čo cítim“</strong>
+            <span class="who">Marek</span>
+          </figcaption>
+        </figure>
+        <figure class="story">
+          <img src="media/ziw-ugc-1.png" alt="71 kg, spánok na bruchu">
+          <figcaption>
+            <span class="card__num">71 kg, spánok na bruchu</span>
+            <strong>„Nemusím sa ráno preťahovať“</strong>
+            <span class="who">Petra</span>
+          </figcaption>
+        </figure>
+        <figure class="story">
+          <img src="media/ziw-ugc-2.png" alt="105 kg, spánok na boku">
+          <figcaption>
+            <span class="card__num">105 kg, spánok na boku</span>
+            <strong>„Partner sa otočí a ja o tom neviem“</strong>
+            <span class="who">Adam</span>
+          </figcaption>
+        </figure>
+      </div>
+      <div class="wrap">
+        <p class="dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></p>
+        <a class="pill pill--ghost" href="#reviews">Všetky recenzie <iconify-icon icon="keyline-icons:chevron-right" width="16" height="16"></iconify-icon></a>
+      </div>
+    </section>
+
+    <section class="theme-light">
+      <div class="wrap">
+        <h2 class="lower">čo na matrac <strong>hovoria odborníci.</strong></h2>
+        <p class="lead">Fyzioterapeuti, ortopédi a ergonómovia spánku, ktorí matrac posudzovali v praxi. Hovoria o hotovom produkte, tak ako ho dostanete domov.</p>
+      </div>
+      <div class="rail" data-rail>
+        <article class="card card--light">
+          <div class="expert-still">
+            <img src="media/ziw-expert.jpg" alt="Mgr. Zuzana Bieliková">
+            <span class="play" aria-hidden="true"><iconify-icon icon="keyline-icons:play" width="18" height="18"></iconify-icon></span>
+            <p class="expert-meta"><span>Panva a ramená v jednej línii</span><span>2:14</span></p>
+          </div>
+          <figcaption>
+            <strong>Mgr. Zuzana Bieliková</strong>
+            <span>fyzioterapeutka, 14 rokov praxe</span>
+          </figcaption>
+        </article>
+        <article class="card card--light">
+          <div class="expert-still">
+            <img src="media/ziw-expert.jpg" alt="Ortopéd">
+            <span class="play" aria-hidden="true"><iconify-icon icon="keyline-icons:play" width="18" height="18"></iconify-icon></span>
+            <p class="expert-meta"><span>Línia pri 55 aj 105 kg</span><span>1:48</span></p>
+          </div>
+          <figcaption>
+            <strong>Ortopéd</strong>
+            <span>chrbtica v línii, nie číslo tvrdosti</span>
+          </figcaption>
+        </article>
+        <article class="card card--light">
+          <div class="expert-still">
+            <img src="media/ziw-expert.jpg" alt="Ergonóm spánku">
+            <span class="play" aria-hidden="true"><iconify-icon icon="keyline-icons:play" width="18" height="18"></iconify-icon></span>
+            <p class="expert-meta"><span>Tlak v ramenách a bokoch</span><span>2:02</span></p>
+          </div>
+          <figcaption>
+            <strong>Ergonóm spánku</strong>
+            <span>tlakové body na hotovom matraci</span>
+          </figcaption>
+        </article>
+        <article class="card card--light">
+          <div class="expert-still">
+            <img src="media/ziw-expert.jpg" alt="Fyzioterapeut">
+            <span class="play" aria-hidden="true"><iconify-icon icon="keyline-icons:play" width="18" height="18"></iconify-icon></span>
+            <p class="expert-meta"><span>Dve osoby, jeden matrac</span><span>1:36</span></p>
+          </div>
+          <figcaption>
+            <strong>Fyzioterapeut</strong>
+            <span>pohyb partnera sa neprenáša</span>
+          </figcaption>
+        </article>
+      </div>
+    </section>
+
+    <section class="theme-black" id="system">
+      <div class="wrap">
+        <h2 class="lower"><strong>ako to funguje?</strong></h2>
+        <p class="lead">ZIW systém tvorí premyslená súhra špeciálnych vrstiev, ktoré sa vzájomne dopĺňajú a spoločne sa prispôsobujú rôznym spánkovým polohám, telesnej hmotnosti …</p>
+        <ol class="layers-list">
+          <li>
+            <img src="media/ziw-layer-1.png" alt="">
+            <div>
+              <strong>kopíruje tvar tela</strong>
+              <span>Gel memory foam</span>
+              <b class="more">Pena, ktorá sleduje kontúru tela</b>
+              <span class="more">Gel memory foam kopíruje ramená, boky aj pás. Tlak ostane rozložený tam, kde telo leží.</span>
+            </div>
+          </li>
+          <li>
+            <img src="media/ziw-layer-2.png" alt="">
+            <div>
+              <strong>rovnomerne rozkladá tlak po väčšej ploche</strong>
+              <span>Convoluted foam</span>
+              <b class="more">Jeden bod sa rozloží na viac menších</b>
+              <span class="more">Profilovaná pena rozbije tlak na väčšiu plochu. Medzi vlnami zároveň odchádza vzduch.</span>
+            </div>
+          </li>
+          <li>
+            <img src="media/ziw-layer-3.png" alt="">
+            <div>
+              <strong>minimalizuje tlakové body</strong>
+              <span>Memory foam s bambusovým uhlím</span>
+              <b class="more">Menej tlaku v ramenách a bokoch</b>
+              <span class="more">Memory foam s bambusovým uhlím uberie špičky tlaku. Povrch ostane bližšie k teplote tela.</span>
+            </div>
+          </li>
+          <li>
+            <img src="media/ziw-layer-4.png" alt="">
+            <div>
+              <strong>Micro Pocket Springs</strong>
+              <span>Micro pocket pružiny</span>
+              <b class="more">Vrstva, ktorá sa dokonale prispôsobí vášmu telu</b>
+              <span class="more">Tisícky malých pružín pracujú samostatne. Reagujú na každý centimeter tela zvlášť.</span>
+            </div>
+          </li>
+          <li>
+            <img src="media/ziw-layer-5.png" alt="">
+            <div>
+              <strong>rovnomerný prenos tlaku do jadra</strong>
+              <span>Integračná / stabilizačná vrstva</span>
+              <b class="more">Vrstvy držia spolu</b>
+              <span class="more">Stabilizačná pena prenesie tlak do jadra rovnomerne. Skladba sa pri otočení nerozíde.</span>
+            </div>
+          </li>
+          <li>
+            <img src="media/ziw-layer-6.png" alt="">
+            <div>
+              <strong>presná a stabilná opora pre celé telo</strong>
+              <span>7-zone Pocket Springs core</span>
+              <b class="more">Opora, ktorá drží líniu</b>
+              <span class="more">Sedem zón taštičkových pružín podoprie telo po dĺžke. Ramená môžu klesnúť, pás ostane v línii.</span>
+            </div>
+          </li>
+        </ol>
+        <a class="pill pill--ghost pill--on-dark" href="#system">Ako celý ZIW systém funguje <iconify-icon icon="keyline-icons:chevron-right" width="16" height="16"></iconify-icon></a>
+      </div>
+    </section>
+
+    <section class="compare theme-light">
+      <div class="wrap">
+        <h2 class="lower">prečo zvoliť <strong>hybridný matrac?</strong></h2>
+        <div class="compare-table">
+          <ul class="compare-props">
+            <li>Priedušnosť</li>
+            <li>Kopírovanie tela</li>
+            <li>Opora chrbtice</li>
+            <li>Pohyb partnera neprenáša</li>
+            <li>Pevná hrana</li>
+            <li>Teplota v lete</li>
+            <li>Životnosť</li>
+          </ul>
+          <div class="compare-ziw">
+            <img src="media/ziw-cmp-ziw.png" alt="">
+            <b>ZIW</b>
+            <i><img src="media/ziw-check-on.svg" alt=""></i>
+            <i><img src="media/ziw-check-on.svg" alt=""></i>
+            <i><img src="media/ziw-check-on.svg" alt=""></i>
+            <i><img src="media/ziw-check-on.svg" alt=""></i>
+            <i><img src="media/ziw-check-on.svg" alt=""></i>
+            <i><img src="media/ziw-check-on.svg" alt=""></i>
+            <i><img src="media/ziw-check-on.svg" alt=""></i>
+          </div>
+          <div class="compare-col">
+            <img src="media/ziw-cmp-foam.png" alt="">
+            <b>Penový</b>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-check-off.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-check-off.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+          </div>
+          <div class="compare-col">
+            <img src="media/ziw-cmp-spring.png" alt="">
+            <b>Pružinový</b>
+            <i><img src="media/ziw-check-off.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-x.svg" alt=""></i>
+            <i><img src="media/ziw-check-off.svg" alt=""></i>
+            <i><img src="media/ziw-check-off.svg" alt=""></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="nights theme-orange">
+      <div class="wrap">
+        <h2 class="lower">Štyri noci, ktoré <strong>cítite každú noc</strong></h2>
+      </div>
+      <img class="nights__bed" src="media/ziw-hero-mattress.png" alt="">
+      <div class="rail" data-rail>
+        <article>
+          <img class="ico" src="media/ziw-ico-mic.svg" alt="">
+          <h3>Nerušený spánok</h3>
+          <p>Partner sa otočí a matrac to neprenesie. Vy ostanete v spánku.</p>
+        </article>
+        <article>
+          <img class="ico" src="media/ziw-ico-sleep.svg" alt="">
+          <h3>Hlboký spánok</h3>
+          <p>Tlakové body vás nevytiahnu na povrch. Noc ostane súvislá.</p>
+        </article>
+        <article>
+          <img class="ico" src="media/ziw-ico-ergo.svg" alt="">
+          <h3>Ergonomický spánok</h3>
+          <p>Ramená klesnú, pás ostane v línii. Ráno nie sú kríže prvé, čo cítite.</p>
+        </article>
+        <article>
+          <iconify-icon class="ico" icon="keyline-icons:wind" width="48" height="48"></iconify-icon>
+          <h3>Priedušný spánok</h3>
+          <p>Vzduch odchádza medzi vrstvami. V lete sa pod vami nedrží teplo.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="lab theme-light">
+      <div class="wrap">
+        <h2 class="lower">Otestované na <strong>desať rokov spánku</strong></h2>
+        <p class="lead">Trvácnosť netvrdíme — meriame ju. Podľa noriem <strong>EN 1957, ISO 3385</strong> a <strong>EN ISO 12947.</strong></p>
+      </div>
+      <div class="rail" data-rail>
+        <article class="lab-card">
+          <img src="media/ziw-lab-1.png" alt="">
+          <b>10 000</b>
+          <h3>sadnutí na hranu</h3>
+          <p>Tri sadnutia denne, desať rokov, záťaž 140 kg.</p>
+        </article>
+        <article class="lab-card">
+          <img src="media/ziw-lab-2.png" alt="">
+          <b>150 000</b>
+          <h3>stlačení pružiny</h3>
+          <p>Desať rokov otáčania. Strata výšky a sily do 5 %.</p>
+        </article>
+        <article class="lab-card">
+          <img src="media/ziw-lab-3.png" alt="">
+          <b>50 000</b>
+          <h3>cyklov oderu poťahu</h3>
+          <p>Norma EN ISO 12947. Poťah, ktorý sa nosí každý deň.</p>
+        </article>
+        <article class="lab-card">
+          <img src="media/ziw-lab-4.png" alt="">
+          <b>140 kg</b>
+          <h3>záťaž v každej skúške</h3>
+          <p>Hrana aj pružiny idú s touto hmotnosťou, nie s priemerom.</p>
+        </article>
+      </div>
+      <div class="wrap">
+        <a class="pill pill--ghost" href="#system">Viac o vývoji <span aria-hidden="true">›</span></a>
+      </div>
+    </section>
+
+    <section class="pressure theme-light">
+      <div class="wrap">
+        <img src="media/ziw-pressure.jpg" alt="Tlaková mapa ZIW a bežného matraca">
+        <h2 class="lower"><strong>Tlaková mapa</strong></h2>
+        <p class="lead">Na obrázku vľavo sa hmotnosť tela vďaka hybridnej konštrukcii ZIW rozkladá rovnomerne a spánok je tak oveľa komfortnejší.</p>
+      </div>
+    </section>
+
+    <div class="dusk-span">
+    <section class="risk theme-dusk">
+      <div class="wrap">
+        <h2 class="lower">Spite bez rizika <strong>Riziko nesieme my</strong></h2>
+        <ul>
+          <li><i aria-hidden="true"><iconify-icon icon="keyline-icons:rotate-ccw" width="17" height="17"></iconify-icon></i><div><strong>100 nocí na vyskúšanie</strong><span>Ak vám nesadne, odvezieme ho a vrátime celú sumu.</span></div></li>
+          <li><i aria-hidden="true"><iconify-icon icon="keyline-icons:shield" width="17" height="17"></iconify-icon></i><div><strong>5 rokov záruka</strong><span>Na pružinové jadro, peny aj penový rám.</span></div></li>
+          <li><i aria-hidden="true"><iconify-icon icon="keyline-icons:truck" width="17" height="17"></iconify-icon></i><div><strong>Doprava aj odvoz zdarma</strong><span>Prinesieme ho do spálne a starý zoberieme so sebou.</span></div></li>
+          <li><i aria-hidden="true"><iconify-icon icon="keyline-icons:badge-check" width="17" height="17"></iconify-icon></i><div><strong>Certifikáty OEKO-TEX® a CertiPUR®</strong><span>Materiály testované na škodlivé látky.</span></div></li>
+          <li><i aria-hidden="true"><iconify-icon icon="keyline-icons:home" width="17" height="17"></iconify-icon></i><div><strong>Slovenská značka</strong><span>Vyvinuté na Slovensku.</span></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="theme-light" id="reviews">
+      <div class="wrap">
+        <p class="reviews-head"><span>Recenzie</span><span>412 hodnotení</span></p>
+        <p class="score">4,8 z 5</p>
+        <div class="bars" aria-hidden="true">
+          <div><span>5</span><i style="--p:84%"></i><span>84 %</span></div>
+          <div><span>4</span><i style="--p:11%"></i><span>11 %</span></div>
+          <div><span>3</span><i style="--p:3%"></i><span>3 %</span></div>
+          <div><span>2</span><i style="--p:1%"></i><span>1 %</span></div>
+          <div><span>1</span><i style="--p:1%"></i><span>1 %</span></div>
+        </div>
+      </div>
+      <div class="rail" data-rail>
+        <blockquote class="quote">
+          <p class="quote__meta"><span>★★★★★</span><span>overený nákup</span></p>
+          <p>Prvý týždeň zvyk, potom som prestal ráno cítiť kríže.</p>
+          <span>Martin Z. · 160×200</span>
+        </blockquote>
+        <blockquote class="quote">
+          <p class="quote__meta"><span>★★★★★</span><span>overený nákup</span></p>
+          <p>Plece na boku už ráno netŕpne. Zvyk trval pár nocí.</p>
+          <span>Zuzana K. · 90×200</span>
+        </blockquote>
+        <blockquote class="quote">
+          <p class="quote__meta"><span>★★★★★</span><span>overený nákup</span></p>
+          <p>Pri 98 kg ostala chrbtica v línii. Tvrdosť som neriešil.</p>
+          <span>Marek H. · 180×200</span>
+        </blockquote>
+        <blockquote class="quote">
+          <p class="quote__meta"><span>★★★★☆</span><span>overený nákup</span></p>
+          <p>Partner sa otočí a matrac to neprenesie. To som chcel.</p>
+          <span>Adam a Nina · 160×200</span>
+        </blockquote>
+      </div>
+    </section>
+
+    <section class="close theme-dusk" id="size">
+      <div class="wrap">
+        <img class="close__mark" src="media/ziw-mark.svg" alt="">
+        <h2 class="lower">Zostáva už len <strong>jedno rozhodnutie</strong></h2>
+        <p>doprava zadarmo · 100 nocí na vyskúšanie</p>
+        <a class="pill pill--light" href="#size">Vybrať rozmer</a>
+      </div>
+    </section>
+    </div>
+
+    <footer class="foot">
+      <p class="logo">
+        <img src="media/ziw-logo.svg" alt="ZIW" width="109" height="23">
+      </p>
+      <nav>
+        <a href="#top">Domov</a>
+        <a href="#size">Produkt</a>
+        <a href="#system">ZIW systém</a>
+        <a href="#top">O nás</a>
+        <a href="#top">Kontakt</a>
+        <a href="#size">Obchod</a>
+      </nav>
+      <hr>
+      <nav class="legal">
+        <a href="#top">Ochrana údajov</a>
+        <a href="#top">Podmienky používania</a>
+        <a href="#top">Nastavenia cookies</a>
+      </nav>
+      <small>© 2026 ZIW. Všetky práva vyhradené.</small>
+    </footer>
+
+    <div class="dock" data-dock aria-hidden="true">
+      <p class="dock__trial"><b>100</b> <span>nocí na <strong>vyskúšanie</strong></span></p>
+      <div data-dock-slot></div>
+    </div>
+  </div>
+
+  <div class="menu" data-menu hidden>
+    <header>
+      <button type="button" data-menu-close aria-label="Zavrieť">✕</button>
+    </header>
+    <nav>
+      <a href="#top">Domov</a>
+      <a href="#size">Produkt</a>
+      <a href="#system">ZIW systém</a>
+      <a href="#reviews">Recenzie</a>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.querySelector("[data-home]");
+      var bar = document.querySelector("[data-bar]");
+      var pause = document.querySelector("[data-pause]");
+      var cta = document.querySelector("[data-cta]");
+      var heroSlot = document.querySelector("[data-hero-slot]");
+      var dock = document.querySelector("[data-dock]");
+      var dockSlot = document.querySelector("[data-dock-slot]");
+      var menu = document.querySelector("[data-menu]");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var docked = false;
+
+      if (pause && bar) {
+        pause.addEventListener("click", function () {
+          bar.classList.toggle("is-paused");
+        });
+      }
+
+      function flip(to) {
+        var first = cta.getBoundingClientRect();
+        to.appendChild(cta);
+        var last = cta.getBoundingClientRect();
+        var dx = first.left - last.left;
+        var dy = first.top - last.top;
+        if (reduce || (Math.abs(dx) < 1 && Math.abs(dy) < 1)) {
+          cta.style.transform = "";
+          return;
+        }
+        cta.style.transition = "none";
+        cta.style.transform = "translate(" + dx + "px," + dy + "px)";
+        requestAnimationFrame(function () {
+          cta.classList.add("is-moving");
+          cta.style.transition = "";
+          cta.style.transform = "";
+          cta.addEventListener("transitionend", function done() {
+            cta.classList.remove("is-moving");
+            cta.removeEventListener("transitionend", done);
+          });
+        });
+      }
+
+      function setDock(on) {
+        dock.classList.toggle("is-on", on);
+        dock.setAttribute("aria-hidden", on ? "false" : "true");
+        if (on === docked) return;
+        docked = on;
+        if (on) flip(dockSlot);
+        else flip(heroSlot);
+      }
+
+      function check() {
+        setDock(heroSlot.getBoundingClientRect().bottom < 72);
+      }
+
+      window.addEventListener("scroll", check, { passive: true });
+      window.addEventListener("resize", check);
+      check();
+
+      var layerRows = document.querySelectorAll(".layers-list li");
+      var hotLayer = null;
+      var layersReady = false;
+      function zoomLayers() {
+        var mid = window.innerHeight / 2;
+        var best = null;
+        var bestDist = 160;
+        layerRows.forEach(function (li) {
+          var r = li.getBoundingClientRect();
+          if (r.bottom < 0 || r.top > window.innerHeight) return;
+          var dist = Math.abs((r.top + r.bottom) / 2 - mid);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = li;
+          }
+        });
+        layerRows.forEach(function (li) { li.classList.toggle("is-hot", li === best); });
+        if (layersReady && best && best !== hotLayer) pulseFoam(best);
+        hotLayer = best;
+        layersReady = true;
+      }
+      window.addEventListener("scroll", zoomLayers, { passive: true });
+      window.addEventListener("resize", zoomLayers);
+      zoomLayers();
+
+      (function lineup() {
+        var section = document.querySelector("[data-choice]");
+        var stage = document.querySelector("[data-lineup]");
+        var track = document.querySelector("[data-li-track]");
+        var counter = document.querySelector("[data-count]");
+        var countLine = document.querySelector("[data-count-line]");
+        var doneLine = document.querySelector("[data-done-line]");
+        if (!section || !stage || !track) return;
+
+        var labels = [
+          "mäkký", "tvrdý", "cítim pružiny", "drží vlhkosť", "zapácha", "prehýba sa",
+          "tlačí ramená", "bolia kríže", "priveľmi hreje", "škrípe", "priehlbina po roku",
+          "v noci sa potím", "bolí driek", "tvrdý na boku", "mäkký na bruchu", "cítim partnera",
+          "hlučný", "prach a alergie", "hrana sa borí", "ťažko sa otáčam", "studený zvrchu",
+          "plesnivie", "poťah sa zlepil", "nedá sa prať", "roluje sa", "praská", "nevyvetrá",
+          "zapadám doň", "netlmí pohyb", "chrbtica sa krúti", "po mesiaci iný", "v zime tuhne",
+          "žltne", "krátky"
+        ];
+        var thumbs = [
+          "media/ziw-matt-beige.png",
+          "media/ziw-matt-gray.png",
+          "media/ziw-matt-brown.png",
+          "media/ziw-matt-rose.png",
+          "media/ziw-matt-olive.png",
+          "media/ziw-matt-blue.png"
+        ];
+        labels.forEach(function (label, i) {
+          var el = document.createElement("div");
+          el.className = "pain";
+          el.setAttribute("data-grey", "");
+          el.innerHTML = "<span>" + label + "</span><img src=\"" + thumbs[i % thumbs.length] + "\" alt=\"\">";
+          track.appendChild(el);
+        });
+        var hero = document.createElement("div");
+        hero.className = "pain-hero";
+        hero.setAttribute("data-hero", "");
+        hero.innerHTML =
+          "<div class=\"pain-hero__bubble\" data-hero-bubble>Adaptívny matrac ZIW<i></i></div>" +
+          "<div class=\"pain-hero__card\">" +
+            "<div class=\"pain-hero__glow\" data-hero-glow></div>" +
+            "<img src=\"media/ziw-mattress-thumb.png\" alt=\"\">" +
+          "</div>";
+        track.appendChild(hero);
+
+        if (reduce) {
+          section.classList.add("is-done");
+          if (counter) counter.textContent = "1";
+          return;
+        }
+
+        var pin = document.querySelector("[data-choice-pin]");
+        var greys = Array.prototype.slice.call(track.querySelectorAll("[data-grey]"));
+        var bubble = track.querySelector("[data-hero-bubble]");
+        var glow = track.querySelector("[data-hero-glow]");
+        var stickyTop = 32;
+        section.classList.add("is-scrub");
+
+        function setCount(n) {
+          if (counter) counter.textContent = String(n);
+        }
+
+        function easeOut(t) {
+          return 1 - Math.pow(1 - t, 3);
+        }
+
+        function render(p) {
+          var W = stage.clientWidth;
+          var from = W * 0.9;
+          var target = W / 2 - (hero.offsetLeft + hero.offsetWidth / 2);
+          var split = 0.78;
+          var e = p < split ? (p / split) * 0.86 : 0.86 + 0.14 * easeOut((p - split) / (1 - split));
+          track.style.transform = "translateX(" + (from + (target - from) * e) + "px)";
+          setCount(Math.max(1, Math.round(403 - 402 * e)));
+          var fade = Math.max(0, Math.min(1, (e - 0.9) / 0.1));
+          greys.forEach(function (g) { g.style.opacity = (0.6 * (1 - fade)).toFixed(3); });
+          bubble.style.opacity = String(fade);
+          bubble.style.transform = "translateY(" + (6 * (1 - fade)) + "px)";
+          glow.style.opacity = String(fade);
+          var done = e > 0.98;
+          section.classList.toggle("is-done", done);
+          if (countLine) countLine.style.opacity = done ? "0" : "1";
+          if (doneLine) {
+            doneLine.style.opacity = done ? "1" : "0";
+            doneLine.style.transform = done ? "none" : "translateY(6px)";
+          }
+        }
+
+        function layout() {
+          var travel = Math.round(window.innerHeight * 1.85);
+          pin.style.height = (section.offsetHeight + travel) + "px";
+          scrub();
+        }
+
+        function scrub() {
+          var travel = pin.offsetHeight - section.offsetHeight;
+          var scrolled = stickyTop - pin.getBoundingClientRect().top;
+          var p = travel > 0 ? Math.max(0, Math.min(1, scrolled / travel)) : 0;
+          render(p);
+        }
+
+        window.addEventListener("scroll", scrub, { passive: true });
+        window.addEventListener("resize", layout);
+        layout();
+      })();
+
+      document.querySelectorAll("[data-rail]").forEach(function (rail) {
+        var dots = rail.parentElement.querySelector(".dots");
+        if (!dots) return;
+        var items = dots.querySelectorAll("i");
+        var cards = rail.children;
+        var prevCard = -1;
+        var railReady = false;
+        function paint() {
+          var edge = rail.scrollLeft + 16;
+          var best = 0;
+          var bestDist = Infinity;
+          for (var i = 0; i < cards.length; i++) {
+            var dist = Math.abs(cards[i].offsetLeft - edge);
+            if (dist < bestDist) {
+              bestDist = dist;
+              best = i;
+            }
+          }
+          items.forEach(function (dot, idx) { dot.classList.toggle("is-on", idx === best); });
+          if (railReady && best !== prevCard) pulseFoam(cards[best]);
+          prevCard = best;
+          railReady = true;
+        }
+        rail.addEventListener("scroll", paint, { passive: true });
+        paint();
+      });
+
+      function openMenu() {
+        menu.hidden = false;
+        menu.classList.add("is-on");
+      }
+      function closeMenu() {
+        menu.classList.remove("is-on");
+        menu.hidden = true;
+      }
+      var held = null;
+      function pulseFoam(el) {
+        if (reduce || !el || el === held || el.hasAttribute("data-cta")) return;
+        el.classList.add("is-sunk");
+        clearTimeout(el._foam);
+        el._foam = setTimeout(function () { el.classList.remove("is-sunk"); }, 280);
+      }
+      function releaseFoam() {
+        if (!held) return;
+        held.classList.remove("is-sunk");
+        held = null;
+      }
+      if (!reduce) {
+        root.addEventListener("pointerdown", function (e) {
+          if (e.button && e.button !== 0) return;
+          var el = e.target.closest("a, button, .rail > article, .card, .layers-list > li");
+          if (!el || el.hasAttribute("data-cta")) return;
+          releaseFoam();
+          clearTimeout(el._foam);
+          held = el;
+          el.classList.add("is-sunk");
+        });
+        window.addEventListener("pointerup", releaseFoam);
+        window.addEventListener("pointercancel", releaseFoam);
+      }
+
+      document.querySelector("[data-menu-open]").addEventListener("click", openMenu);
+      document.querySelector("[data-menu-close]").addEventListener("click", closeMenu);
+      menu.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", closeMenu);
+      });
+    })();
+  </script>
+</body>
+</html>
