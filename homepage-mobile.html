@@ -62,6 +62,10 @@
     @media (max-width: 767px) {
       .phone { width: 100%; }
       .wrap { width: calc(100% - 2 * var(--pad)); }
+      .dock {
+        left: 16px;
+        right: 16px;
+      }
     }
 
     .wrap {
@@ -164,20 +168,22 @@
       display: flex;
       gap: 12px;
       margin-top: 24px;
-      padding: 0 calc(50% - 126.5px) 36px;
+      padding: 0 var(--pad) 36px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      scroll-padding-inline: 0;
+      scroll-padding-inline: var(--pad);
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
 
     .rail::-webkit-scrollbar { display: none; }
-    .rail > * {
+    .rail > *,
+    .rail > article,
+    .rail > .card {
       flex: 0 0 253px;
-      scroll-snap-align: center;
+      scroll-snap-align: start;
       transform: scale(0.86);
-      transform-origin: center center;
+      transform-origin: left center;
       transition: transform 640ms var(--foam-back);
     }
     .rail > .is-hot { transform: scale(1); }
@@ -420,21 +426,26 @@
     }
 
     /* Choice — sticky while vertical scroll scrubs the lineup */
+    .dusk-band,
+    .choice-pin { overflow: visible; }
     .choice-pin .choice {
+      position: -webkit-sticky;
       position: sticky;
       top: 32px;
       z-index: 3;
       display: flex;
       flex-direction: column;
-      min-height: calc(100vh - 32px);
-      min-height: calc(100dvh - 32px);
+      height: calc(100svh - 32px);
+      max-height: calc(100svh - 32px);
+      min-height: 0;
+      overflow: hidden;
       background: radial-gradient(90% 70% at 50% 22%, #2c2e33 0%, #1a1b1e 48%, #121314 100%);
     }
     .choice-pin .pains-mask {
       position: absolute;
       left: 0;
       right: 0;
-      top: calc(50vh - 32px);
+      top: 50%;
       margin: 0;
       transform: translateY(-50%);
     }
@@ -711,73 +722,65 @@
       border-bottom: 1px solid transparent;
       transition:
         transform 640ms var(--foam-back),
-        grid-template-columns 640ms var(--foam-back),
-        padding 640ms var(--foam-back),
-        gap 640ms var(--foam-back),
-        margin 640ms var(--foam-back),
-        border-color 640ms var(--foam-back);
+        grid-template-columns 560ms var(--foam-back),
+        padding 560ms var(--foam-back),
+        gap 560ms var(--foam-back),
+        margin 560ms var(--foam-back),
+        border-color 560ms var(--foam-back);
     }
     .layers-list img {
-      width: 120px;
+      width: 100%;
       height: auto;
-      transition: width 640ms var(--foam-back);
+    }
+    .layers-list > li > div {
+      display: grid;
+      grid-template-rows: auto auto 0fr 0fr;
+      align-self: start;
+      min-width: 0;
+      transition: grid-template-rows 560ms var(--foam-back);
+    }
+    .layers-list > li > div > * {
+      min-height: 0;
+      overflow: hidden;
     }
     .layers-list strong {
       display: block;
       font-size: 14px;
       font-weight: 500;
-      transition: color 640ms var(--foam-back), font-size 640ms var(--foam-back);
+      transition: color 560ms var(--foam-back), font-size 560ms var(--foam-back);
     }
     .layers-list b,
     .layers-list .more {
       display: block;
-      max-height: 0;
       margin: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 640ms var(--foam-back), opacity 480ms var(--foam-back), margin 640ms var(--foam-back);
     }
     .layers-list span {
       display: block;
-      max-height: 4.5em;
       color: var(--muted);
       font-size: 12px;
       line-height: 1.5;
-      overflow: hidden;
-      transition: max-height 640ms var(--foam-back), opacity 480ms var(--foam-back);
     }
     .layers-list li.is-hot {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 0px);
+      grid-template-columns: 220px minmax(0, 1fr);
       align-items: start;
-      gap: 24px;
-      margin-inline: -8px;
-      padding: 24px 8px;
+      gap: 16px;
+      margin-inline: 0;
+      padding: 20px 0;
       border-color: #676c83;
     }
-    .layers-list li.is-hot img {
-      grid-column: 1 / -1;
-      width: min(240px, 100%);
+    .layers-list li.is-hot > div {
+      grid-template-rows: auto 0fr auto auto;
     }
-    .layers-list li.is-hot > div { grid-column: 1 / -1; }
     .layers-list li.is-hot strong {
       color: var(--orange);
       font-size: 16px;
       font-weight: 700;
-    }
-    .layers-list li.is-hot b,
-    .layers-list li.is-hot .more {
-      max-height: 6em;
-      opacity: 1;
     }
     .layers-list li.is-hot b {
       margin-top: 4px;
       color: #fff;
       font-size: 15px;
       font-weight: 500;
-    }
-    .layers-list li.is-hot:has(.more) > div > span:not(.more) {
-      max-height: 0;
-      opacity: 0;
     }
 
     /* Compare */
@@ -875,7 +878,6 @@
     .nights p { margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.5; text-align: center; }
 
     /* Lab — Figma cards are 190px */
-    .lab .rail { padding-inline: calc(50% - 95px); }
     .lab .rail > * { flex-basis: 190px; }
     .lab-card {
       overflow: hidden;
@@ -1630,7 +1632,7 @@
       }
 
       function check() {
-        setDock(heroSlot.getBoundingClientRect().bottom < 72);
+        setDock(window.scrollY > 4);
       }
 
       window.addEventListener("scroll", check, { passive: true });
@@ -1640,38 +1642,37 @@
       var layerRows = document.querySelectorAll(".layers-list li");
       var hotLayer = null;
       var layersReady = false;
+      var layerTick = false;
       function zoomLayers() {
         var mid = window.innerHeight / 2;
         var best = null;
-        var bestDist = 160;
+        var bestDist = 180;
+        var hotDist = Infinity;
         layerRows.forEach(function (li) {
           var r = li.getBoundingClientRect();
-          if (r.bottom < 0 || r.top > window.innerHeight) return;
+          if (r.bottom < 48 || r.top > window.innerHeight - 48) return;
           var dist = Math.abs((r.top + r.bottom) / 2 - mid);
+          if (li === hotLayer) hotDist = dist;
           if (dist < bestDist) {
             bestDist = dist;
             best = li;
           }
         });
-        var tops = [];
-        layerRows.forEach(function (li) { tops.push(li.getBoundingClientRect().top); });
+        if (hotLayer && best && best !== hotLayer && hotDist < bestDist + 56) best = hotLayer;
+        if (best === hotLayer && layersReady) return;
         layerRows.forEach(function (li) { li.classList.toggle("is-hot", li === best); });
-        if (layersReady && !reduce) {
-          layerRows.forEach(function (li, i) {
-            var dy = tops[i] - li.getBoundingClientRect().top;
-            if (Math.abs(dy) < 1) return;
-            li.style.transition = "none";
-            li.style.transform = "translateY(" + dy + "px)";
-            requestAnimationFrame(function () {
-              li.style.transition = "";
-              li.style.transform = "";
-            });
-          });
-        }
         hotLayer = best;
         layersReady = true;
       }
-      window.addEventListener("scroll", zoomLayers, { passive: true });
+      function onLayerScroll() {
+        if (layerTick) return;
+        layerTick = true;
+        requestAnimationFrame(function () {
+          layerTick = false;
+          zoomLayers();
+        });
+      }
+      window.addEventListener("scroll", onLayerScroll, { passive: true });
       window.addEventListener("resize", zoomLayers);
       zoomLayers();
 
@@ -1801,6 +1802,11 @@
           heroFold.style.setProperty("--resist", "0px");
         }
 
+        function releaseDock() {
+          clearResist();
+          if (window.scrollY <= 4) setDock(false);
+        }
+
         function glideToChoice() {
           var target = pin.getBoundingClientRect().top + window.scrollY - stickyTop;
           var from = window.scrollY;
@@ -1823,10 +1829,11 @@
           }
           if (e.deltaY <= 0 || !heroResting()) {
             clearTimeout(resistTimer);
-            clearResist();
+            releaseDock();
             return;
           }
           e.preventDefault();
+          setDock(true);
           resistPx += e.deltaY;
           paintResist();
           clearTimeout(resistTimer);
@@ -1834,7 +1841,7 @@
             glideToChoice();
             return;
           }
-          resistTimer = setTimeout(clearResist, 160);
+          resistTimer = setTimeout(releaseDock, 160);
         }, { passive: false });
 
         var touchY = 0;
@@ -1851,12 +1858,13 @@
           var dy = touchY - e.touches[0].clientY;
           if (dy <= 8) return;
           e.preventDefault();
+          setDock(true);
           resistPx = dy;
           paintResist();
           if (dy > 48) glideToChoice();
         }, { passive: false });
         window.addEventListener("touchend", function () {
-          if (!locking) clearResist();
+          if (!locking) releaseDock();
         });
       })();
 
@@ -1865,12 +1873,11 @@
         var items = dots ? dots.querySelectorAll("i") : [];
         var cards = rail.children;
         function paint() {
-          var mid = rail.scrollLeft + rail.clientWidth / 2;
+          var edge = rail.scrollLeft + 16;
           var best = 0;
           var bestDist = Infinity;
           for (var i = 0; i < cards.length; i++) {
-            var center = cards[i].offsetLeft + cards[i].offsetWidth / 2;
-            var dist = Math.abs(center - mid);
+            var dist = Math.abs(cards[i].offsetLeft - edge);
             if (dist < bestDist) {
               bestDist = dist;
               best = i;
