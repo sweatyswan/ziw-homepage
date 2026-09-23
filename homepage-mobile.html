@@ -118,14 +118,14 @@
     section { padding: var(--section) 0; }
     #system { padding-bottom: 0; }
     #system .wrap { padding-bottom: 40px; }
-    .system-pin { position: relative; }
+    .system-pin { position: relative; overflow-anchor: none; }
     .system-stick {
       position: relative;
       z-index: 4;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
-      height: calc(100svh - var(--bar-h));
+      height: calc(var(--fold, 100svh) - var(--bar-h));
       padding: 40px 0 32px;
       overflow: hidden;
       background: var(--charcoal-dark);
@@ -322,10 +322,10 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: calc(100vh - 88px);
-      min-height: calc(100dvh - 88px);
+      min-height: calc(var(--fold, 100svh) - 88px);
       padding: 40px 0 0;
       overflow: hidden;
+      overflow-anchor: none;
       text-align: center;
     }
 
@@ -467,14 +467,13 @@
     }
 
     /* Choice — sticky while vertical scroll scrubs the lineup */
-    .choice-pin { position: relative; overflow: visible; }
+    .choice-pin { position: relative; overflow: visible; overflow-anchor: none; }
     .choice-pin .choice {
       position: relative;
       z-index: 3;
       display: flex;
       flex-direction: column;
-      height: calc(100svh - 32px);
-      max-height: calc(100dvh - 32px);
+      height: calc(var(--fold, 100svh) - 32px);
       min-height: 0;
       overflow: hidden;
       background: radial-gradient(90% 70% at 50% 22%, #2c2e33 0%, #1a1b1e 48%, #121314 100%);
@@ -1657,10 +1656,10 @@
       }
 
       function setDock(on) {
-        dock.classList.toggle("is-on", on);
-        dock.setAttribute("aria-hidden", on ? "false" : "true");
         if (on === docked) return;
         docked = on;
+        dock.classList.toggle("is-on", on);
+        dock.setAttribute("aria-hidden", on ? "false" : "true");
         if (on) flip(dockSlot);
         else flip(heroSlot);
       }
@@ -1689,8 +1688,61 @@
         var vv = window.visualViewport;
         return Math.round((vv && vv.height) || window.innerHeight);
       }
+      var foldH = 0;
+      function lockFold() {
+        var vh = viewHeight();
+        if (foldH && Math.abs(vh - foldH) < 140) return;
+        foldH = vh;
+        document.documentElement.style.setProperty("--fold", vh + "px");
+      }
+      lockFold();
+      window.addEventListener("resize", lockFold);
       function barBottom() {
         return barEl ? barEl.getBoundingClientRect().bottom : 32;
+      }
+      function pinMode(scrolled, travel, prev) {
+        var slack = 16;
+        if (prev === "fixed") {
+          if (scrolled < -slack) return "flow";
+          if (scrolled > travel + slack) return "end";
+          return "fixed";
+        }
+        if (prev === "end") {
+          if (scrolled < travel - slack) return "fixed";
+          return "end";
+        }
+        if (scrolled > slack) return "fixed";
+        return "flow";
+      }
+      function applyPin(el, mode, top, box) {
+        if (mode === "fixed") {
+          if (el._pinMode !== "fixed") {
+            el.classList.add("is-fixed");
+            el.classList.remove("is-end");
+            el._pinMode = "fixed";
+          }
+          var nextTop = Math.round(top);
+          if (el._pinTop == null || Math.abs(nextTop - el._pinTop) > 2) el._pinTop = nextTop;
+          var topPx = el._pinTop + "px";
+          var nextLeft = Math.round(box.left);
+          var nextWidth = Math.round(box.width);
+          if (el._pinLeft == null || Math.abs(nextLeft - el._pinLeft) > 1) el._pinLeft = nextLeft;
+          if (el._pinWidth == null || Math.abs(nextWidth - el._pinWidth) > 1) el._pinWidth = nextWidth;
+          if (el.style.top !== topPx) el.style.top = topPx;
+          if (el.style.left !== el._pinLeft + "px") el.style.left = el._pinLeft + "px";
+          if (el.style.width !== el._pinWidth + "px") el.style.width = el._pinWidth + "px";
+          return;
+        }
+        el._pinTop = null;
+        el._pinLeft = null;
+        el._pinWidth = null;
+        if (el._pinMode === mode) return;
+        el.classList.remove("is-fixed");
+        el.classList.toggle("is-end", mode === "end");
+        el.style.top = "";
+        el.style.left = "";
+        el.style.width = "";
+        el._pinMode = mode;
       }
       function placeSystemLayers(p) {
         if (!layerList || !layerRows.length) return;
@@ -1702,40 +1754,37 @@
         var endY = view.clientHeight - pad - (lastRow.offsetTop - layerList.offsetTop + lastRow.offsetHeight);
         layerList.style.transform = "translateY(" + (startY + (endY - startY) * p) + "px)";
       }
+      var systemLaidH = 0;
       function layoutSystem() {
         if (!systemPin || !systemStick || reduce) return;
-        var h = Math.max(420, viewHeight() - Math.round(barBottom()));
+        var vh = viewHeight();
+        if (systemLaidH && Math.abs(vh - systemLaidH) < 140) {
+          scrubSystem();
+          return;
+        }
+        systemLaidH = vh;
+        var h = Math.max(420, vh - Math.round(barBottom()));
         systemStick.style.height = h + "px";
-        systemPin.style.height = (h + Math.round(viewHeight() * 1.6)) + "px";
+        systemPin.style.height = (h + Math.round(vh * 1.6)) + "px";
         scrubSystem();
       }
       function scrubSystem() {
         if (!systemPin || !systemStick || reduce) return;
+        var top = barEl ? barEl.offsetHeight : 32;
+        var pinTop = systemPin.getBoundingClientRect().top;
+        var scrolled = top - pinTop;
+        var prev = systemStick._pinMode || "flow";
+        if (prev === "flow" && scrolled < -160 && systemStick._scrubbed) return;
         var h = systemStick.offsetHeight;
         var travel = Math.max(1, systemPin.offsetHeight - h);
-        var top = barBottom();
-        var scrolled = top - systemPin.getBoundingClientRect().top;
-        systemStick.classList.remove("is-fixed", "is-end");
-        systemStick.style.top = "";
-        systemStick.style.left = "";
-        systemStick.style.width = "";
-        if (scrolled > 0 && scrolled < travel) {
-          var box = systemPin.getBoundingClientRect();
-          systemStick.classList.add("is-fixed");
-          systemStick.style.top = top + "px";
-          systemStick.style.left = box.left + "px";
-          systemStick.style.width = box.width + "px";
-        } else if (scrolled >= travel) {
-          systemStick.classList.add("is-end");
-        }
+        if (prev === "end" && scrolled > travel + 160) return;
+        systemStick._scrubbed = true;
+        var mode = pinMode(scrolled, travel, systemStick._pinMode);
+        applyPin(systemStick, mode, top, systemPin.getBoundingClientRect());
         placeSystemLayers(Math.max(0, Math.min(1, scrolled / travel)));
       }
       window.addEventListener("scroll", scrubSystem, { passive: true });
       window.addEventListener("resize", layoutSystem);
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener("resize", layoutSystem);
-        window.visualViewport.addEventListener("scroll", scrubSystem);
-      }
       layoutSystem();
 
       (function lineup() {
@@ -1830,50 +1879,38 @@
           return Math.round((vv && vv.height) || window.innerHeight);
         }
 
+        var laidH = 0;
         function layout() {
-          var h = Math.max(420, viewHeight() - stickyTop);
+          var vh = viewHeight();
+          if (laidH && Math.abs(vh - laidH) < 140) {
+            scrub();
+            return;
+          }
+          laidH = vh;
+          var h = Math.max(420, vh - stickyTop);
           section.style.height = h + "px";
-          var travel = Math.round(viewHeight() * 1.85);
+          var travel = Math.round(vh * 1.85);
           pin.style.height = (h + travel) + "px";
           scrub();
         }
 
         function scrub() {
+          var top = stickyTop;
+          var pinTop = pin.getBoundingClientRect().top;
+          var scrolled = top - pinTop;
+          var prev = section._pinMode || "flow";
+          if (prev === "flow" && scrolled < -160 && section._scrubbed) return;
           var h = section.offsetHeight;
           var travel = Math.max(1, pin.offsetHeight - h);
-          var pinTop = pin.getBoundingClientRect().top;
-          var scrolled = stickyTop - pinTop;
-          var vv = window.visualViewport;
-          var top = stickyTop + (vv ? vv.offsetTop : 0);
-          var mode = scrolled <= 0 ? "flow" : (scrolled >= travel ? "end" : "fixed");
-          section.classList.remove("is-fixed", "is-end");
-          section.style.top = "";
-          section.style.left = "";
-          section.style.width = "";
-          if (mode === "fixed") {
-            var box = pin.getBoundingClientRect();
-            section.classList.add("is-fixed");
-            section.style.top = top + "px";
-            section.style.left = box.left + "px";
-            section.style.width = box.width + "px";
-          } else if (mode === "end") {
-            section.classList.add("is-end");
-          }
-          if (mode !== scrub.mode) {
-            // #region agent log
-            fetch('http://127.0.0.1:7623/ingest/f185a511-a5a8-4402-bd20-653612b5a503',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'106ad1'},body:JSON.stringify({sessionId:'106ad1',hypothesisId:'A',location:'homepage-mobile.html:scrub',message:'choice pin mode',data:{from:scrub.mode||'start',to:mode,scrolled:Math.round(scrolled),travel:Math.round(travel),scrollY:Math.round(window.scrollY),pinTop:Math.round(pinTop),vvTop:vv?Math.round(vv.offsetTop):0},timestamp:Date.now()})}).catch(function(){});
-            // #endregion
-            scrub.mode = mode;
-          }
+          if (prev === "end" && scrolled > travel + 160) return;
+          section._scrubbed = true;
+          var mode = pinMode(scrolled, travel, section._pinMode);
+          applyPin(section, mode, top, pin.getBoundingClientRect());
           render(Math.max(0, Math.min(1, scrolled / travel)));
         }
 
         window.addEventListener("scroll", scrub, { passive: true });
         window.addEventListener("resize", layout);
-        if (window.visualViewport) {
-          window.visualViewport.addEventListener("resize", layout);
-          window.visualViewport.addEventListener("scroll", scrub);
-        }
         layout();
 
         var heroFold = document.querySelector(".hero");
@@ -1908,21 +1945,34 @@
           var from = window.scrollY;
           var t0 = performance.now();
           locking = true;
+          armLock();
           clearResist();
           function step(now) {
             var t = Math.min(1, (now - t0) / 620);
             window.scrollTo(0, from + (target - from) * easeOut(t));
             if (t < 1) requestAnimationFrame(step);
-            else locking = false;
+            else {
+              locking = false;
+              disarmLock();
+            }
           }
           requestAnimationFrame(step);
         }
 
-        window.addEventListener("wheel", function (e) {
-          if (locking) {
-            e.preventDefault();
-            return;
-          }
+        function blockScroll(e) {
+          if (locking) e.preventDefault();
+        }
+        function armLock() {
+          window.addEventListener("wheel", blockScroll, { passive: false });
+          window.addEventListener("touchmove", blockScroll, { passive: false });
+        }
+        function disarmLock() {
+          window.removeEventListener("wheel", blockScroll);
+          window.removeEventListener("touchmove", blockScroll);
+        }
+
+        heroFold.addEventListener("wheel", function (e) {
+          if (locking) return;
           if (e.deltaY <= 0 || !heroResting()) {
             clearTimeout(resistTimer);
             releaseDock();
@@ -1941,16 +1991,12 @@
         }, { passive: false });
 
         var touchY = 0;
-        window.addEventListener("touchstart", function (e) {
+        heroFold.addEventListener("touchstart", function (e) {
           if (!heroResting()) return;
           touchY = e.touches[0].clientY;
         }, { passive: true });
-        window.addEventListener("touchmove", function (e) {
-          if (locking) {
-            e.preventDefault();
-            return;
-          }
-          if (!heroResting()) return;
+        heroFold.addEventListener("touchmove", function (e) {
+          if (locking || !heroResting()) return;
           var dy = touchY - e.touches[0].clientY;
           if (dy <= 8) return;
           e.preventDefault();
@@ -1959,7 +2005,7 @@
           paintResist();
           if (dy > 48) glideToChoice();
         }, { passive: false });
-        window.addEventListener("touchend", function () {
+        heroFold.addEventListener("touchend", function () {
           if (!locking) releaseDock();
         });
       })();
