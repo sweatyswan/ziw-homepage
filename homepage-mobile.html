@@ -722,10 +722,8 @@
       border-bottom: 1px solid transparent;
       transition:
         transform 640ms var(--foam-back),
-        grid-template-columns 560ms var(--foam-back),
         padding 560ms var(--foam-back),
         gap 560ms var(--foam-back),
-        margin 560ms var(--foam-back),
         border-color 560ms var(--foam-back);
     }
     .layers-list img {
@@ -761,12 +759,15 @@
       line-height: 1.5;
     }
     .layers-list li.is-hot {
-      grid-template-columns: 220px minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr);
       align-items: start;
-      gap: 16px;
-      margin-inline: 0;
+      gap: 12px;
       padding: 20px 0;
       border-color: #676c83;
+    }
+    .layers-list li.is-hot img {
+      width: 100%;
+      max-width: 280px;
     }
     .layers-list li.is-hot > div {
       grid-template-rows: auto 0fr auto auto;
