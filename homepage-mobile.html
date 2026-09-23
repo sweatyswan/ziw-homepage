@@ -116,8 +116,43 @@
     .theme-dusk .pill--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.72); }
 
     section { padding: var(--section) 0; }
-    #system { padding-bottom: 0; }
-    #system .wrap { padding-bottom: 40px; }
+    #system { padding: 0; }
+    #system .wrap { padding-bottom: 0; }
+    .system-pin { position: relative; }
+    .system-stick {
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      height: calc(100svh - 32px);
+      padding: 40px 0;
+      background: var(--charcoal-dark);
+    }
+    .system-stick .wrap {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .system-stick.is-fixed {
+      position: fixed;
+      z-index: 4;
+    }
+    .system-stick.is-end {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: auto;
+    }
+    .layers-viewport {
+      flex: 1;
+      min-height: 0;
+      margin-top: 8px;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%);
+    }
+    #system .pill { margin-top: 16px; }
 
     .pill {
       display: inline-flex;
@@ -709,7 +744,7 @@
     }
 
     /* Layers */
-    .layers-list { display: grid; margin: 24px 0 0; overflow-anchor: none; }
+    .layers-list { display: grid; margin: 0; overflow-anchor: none; will-change: transform; }
     .layers-list > li {
       display: grid;
       grid-template-columns: 120px minmax(0, 1fr);
@@ -821,7 +856,7 @@
       border-radius: 16px;
       box-shadow: 0 20px 24px -4px rgba(0, 0, 0, 0.08);
     }
-    .compare-ziw > img { border: 1px solid #fff; }
+    .compare-ziw > img { border: 1px solid #fff; background: #fff; }
     .compare-ziw b,
     .compare-col b {
       display: block;
@@ -1292,10 +1327,13 @@
     </section>
 
     <section class="theme-black" id="system">
-      <div class="wrap">
-        <h2 class="lower"><strong>ako to funguje?</strong></h2>
-        <p class="lead">ZIW systém tvorí premyslená súhra špeciálnych vrstiev, ktoré sa vzájomne dopĺňajú a spoločne sa prispôsobujú rôznym spánkovým polohám, telesnej hmotnosti …</p>
-        <ol class="layers-list">
+      <div class="system-pin" data-system-pin>
+        <div class="system-stick" data-system-stick>
+          <div class="wrap">
+            <h2 class="lower"><strong>ako to funguje?</strong></h2>
+            <p class="lead">ZIW systém tvorí premyslená súhra špeciálnych vrstiev, ktoré sa vzájomne dopĺňajú a spoločne sa prispôsobujú rôznym spánkovým polohám, telesnej hmotnosti …</p>
+            <div class="layers-viewport">
+              <ol class="layers-list">
           <li>
             <img src="media/ziw-layer-1.png" alt="">
             <div>
@@ -1351,7 +1389,10 @@
             </div>
           </li>
         </ol>
-        <a class="pill pill--ghost pill--on-dark" href="#system">Ako celý ZIW systém funguje <iconify-icon icon="keyline-icons:chevron-right" width="16" height="16"></iconify-icon></a>
+            </div>
+            <a class="pill pill--ghost pill--on-dark" href="#system">Ako celý ZIW systém funguje <iconify-icon icon="keyline-icons:chevron-right" width="16" height="16"></iconify-icon></a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1637,59 +1678,74 @@
       check();
 
       var layerRows = document.querySelectorAll(".layers-list li");
+      var layerList = document.querySelector(".layers-list");
+      var systemPin = document.querySelector("[data-system-pin]");
+      var systemStick = document.querySelector("[data-system-stick]");
       var hotLayer = null;
-      var layersReady = false;
-      var layerTick = false;
-      var centering = false;
-      function easeCenter(t) { return 1 - Math.pow(1 - t, 3); }
-      function centerLayer(li) {
-        if (!li || reduce) return;
-        centering = true;
+      function alignHot(index) {
+        var row = layerRows[index];
+        if (!row || !layerList) return;
+        var view = layerList.parentElement.getBoundingClientRect();
+        var rowBox = row.getBoundingClientRect();
+        var half = rowBox.height / 2;
+        var target = window.innerHeight / 2;
+        target = Math.max(view.top + half, Math.min(view.bottom - half, target));
+        var current = 0;
+        var match = /translateY\(([-\d.]+)px\)/.exec(layerList.style.transform || "");
+        if (match) current = parseFloat(match[1]);
+        layerList.style.transform = "translateY(" + (current + target - (rowBox.top + half)) + "px)";
+      }
+      function placeLayers(index) {
+        var changed = layerRows[index] !== hotLayer;
+        layerRows.forEach(function (li, i) { li.classList.toggle("is-hot", i === index); });
+        alignHot(index);
+        hotLayer = layerRows[index];
+        if (!changed) return;
         var t0 = performance.now();
-        function step(now) {
-          var t = Math.min(1, (now - t0) / 560);
-          var r = li.getBoundingClientRect();
-          var delta = (r.top + r.height / 2) - window.innerHeight / 2;
-          if (Math.abs(delta) > 0.5) window.scrollBy(0, delta * (0.22 + 0.5 * easeCenter(t)));
-          if (t < 1) requestAnimationFrame(step);
-          else centering = false;
+        function follow(now) {
+          alignHot(index);
+          if (now - t0 < 580 && hotLayer === layerRows[index]) requestAnimationFrame(follow);
         }
-        requestAnimationFrame(step);
+        requestAnimationFrame(follow);
       }
-      function zoomLayers() {
-        if (centering) return;
-        var mid = window.innerHeight / 2;
-        var best = null;
-        var bestDist = 220;
-        var hotDist = Infinity;
-        layerRows.forEach(function (li) {
-          var r = li.getBoundingClientRect();
-          if (r.bottom < 0 || r.top > window.innerHeight) return;
-          var dist = Math.abs((r.top + r.bottom) / 2 - mid);
-          if (li === hotLayer) hotDist = dist;
-          if (dist < bestDist) {
-            bestDist = dist;
-            best = li;
-          }
-        });
-        if (hotLayer && best && best !== hotLayer && hotDist < bestDist + 48) best = hotLayer;
-        if (best === hotLayer && layersReady) return;
-        layerRows.forEach(function (li) { li.classList.toggle("is-hot", li === best); });
-        hotLayer = best;
-        layersReady = true;
-        centerLayer(best);
+      function scrubSystem() {
+        if (!systemPin || !systemStick || reduce) return;
+        var h = systemStick.offsetHeight;
+        var travel = Math.max(1, systemPin.offsetHeight - h);
+        var scrolled = 32 - systemPin.getBoundingClientRect().top;
+        var vv = window.visualViewport;
+        var top = 32 + (vv ? vv.offsetTop : 0);
+        systemStick.classList.remove("is-fixed", "is-end");
+        systemStick.style.top = "";
+        systemStick.style.left = "";
+        systemStick.style.width = "";
+        if (scrolled > 0 && scrolled < travel) {
+          var box = systemPin.getBoundingClientRect();
+          systemStick.classList.add("is-fixed");
+          systemStick.style.top = top + "px";
+          systemStick.style.left = box.left + "px";
+          systemStick.style.width = box.width + "px";
+        } else if (scrolled >= travel) {
+          systemStick.classList.add("is-end");
+        }
+        var p = Math.max(0, Math.min(1, scrolled / travel));
+        placeLayers(Math.round(p * (layerRows.length - 1)));
       }
-      function onLayerScroll() {
-        if (layerTick) return;
-        layerTick = true;
-        requestAnimationFrame(function () {
-          layerTick = false;
-          zoomLayers();
-        });
+      function layoutSystem() {
+        if (!systemPin || !systemStick || reduce) return;
+        var viewH = Math.round((window.visualViewport && window.visualViewport.height) || window.innerHeight);
+        var h = Math.max(420, viewH - 32);
+        systemStick.style.height = h + "px";
+        systemPin.style.height = (h + Math.round(viewH * 1.7)) + "px";
+        scrubSystem();
       }
-      window.addEventListener("scroll", onLayerScroll, { passive: true });
-      window.addEventListener("resize", zoomLayers);
-      zoomLayers();
+      window.addEventListener("scroll", scrubSystem, { passive: true });
+      window.addEventListener("resize", layoutSystem);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", layoutSystem);
+        window.visualViewport.addEventListener("scroll", scrubSystem);
+      }
+      layoutSystem();
 
       (function lineup() {
         var section = document.querySelector("[data-choice]");
